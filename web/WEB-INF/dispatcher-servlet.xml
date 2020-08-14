@@ -1,0 +1,166 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!-- was: <?xml version="1.0" encoding="UTF-8"?> -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+
+    <bean class="org.springframework.web.servlet.mvc.support.ControllerClassNameHandlerMapping"/>
+
+    <!--
+    Most controllers will use the ControllerClassNameHandlerMapping above, but
+    for the index controller we are using ParameterizableViewController, so we must
+    define an explicit mapping for it.
+    -->
+    <bean id="urlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="mappings">
+            <props>
+                <prop key="login.htm">loginController</prop>
+                <prop key="index.htm">Controller_index</prop>
+                
+                <!-- GPS -->
+                <prop key="asociar_gps.htm">Controller_asociarGPS</prop>
+                <prop key="buscar_niv.htm">Controller_asociarGPS</prop>
+                <prop key="registrar_asociacion.htm">Controller_asociarGPS</prop>
+                
+                <prop key="consultar_gps.htm">Controller_consultarGPS</prop>
+                <prop key="buscar_gps.htm">Controller_consultarGPS</prop>
+                <prop key="obtener_datos_gps.htm">Controller_consultarGPS</prop>
+                <prop key="actualizar_gps.htm">Controller_consultarGPS</prop>
+                
+                <prop key="eliminar_gps.htm">Controller_eliminarGPS</prop>
+                <prop key="eliminar_informacion_gps.htm">Controller_eliminarGPS</prop>
+                
+                <!-- CAPAS -->
+                <prop key="crear_capa.htm">Controller_crearCapa</prop>
+                <prop key="validar_capa.htm">Controller_crearCapa</prop>
+                <prop key="registrar_capa.htm">Controller_crearCapa</prop>
+                
+                <prop key="consultar_capa.htm">Controller_consultarCapa</prop>
+                <prop key="obtener_datos_capa.htm">Controller_consultarCapa</prop>
+                <prop key="editar_capa.htm">Controller_consultarCapa</prop>
+                <prop key="deshabilitar_capa.htm">Controller_consultarCapa</prop>
+                <prop key="eliminar_capa.htm">Controller_consultarCapa</prop>
+                
+                <!-- RUTAS -->
+                <prop key="crear_ruta.htm">Controller_crearRuta</prop>
+                <prop key="validar_ruta.htm">Controller_crearRuta</prop>
+                <prop key="registrar_ruta.htm">Controller_crearRuta</prop>
+                <prop key="buscar_unidad.htm">Controller_crearRuta</prop>
+                
+                <prop key="consultar_ruta.htm">Controller_consultarRuta</prop>
+                <prop key="buscar_ruta.htm">Controller_consultarRuta</prop>
+                <prop key="obtener_datos_ruta.htm">Controller_consultarRuta</prop>
+                <prop key="editar_ruta.htm">Controller_consultarRuta</prop>
+                <prop key="deshabilitar_ruta.htm">Controller_consultarRuta</prop>
+                <prop key="eliminar_ruta.htm">Controller_consultarRuta</prop>
+                
+                
+                <!-- RAMALES -->
+                <prop key="crear_ramal.htm">Controller_crearRamal</prop>
+                <prop key="validar_ramal.htm">Controller_crearRamal</prop>
+                <prop key="registrar_ramal.htm">Controller_crearRamal</prop>
+                <prop key="obtener_kmz_ruta.htm">Controller_crearRamal</prop>
+                
+                <prop key="consultar_ramal.htm">Controller_consultarRamal</prop>
+                <prop key="buscar_ramal.htm">Controller_consultarRamal</prop>
+                <prop key="obtener_datos_ramal.htm">Controller_consultarRamal</prop>
+                <prop key="editar_ramal.htm">Controller_consultarRamal</prop>
+                <prop key="deshabilitar_ramal.htm">Controller_consultarRamal</prop>
+                <prop key="eliminar_ramal.htm">Controller_consultarRamal</prop>
+                
+                <!-- ITINERARIOS -->
+                <prop key="crear_itinerario.htm">Controller_crearItinerario</prop>
+                <prop key="validar_itinerario.htm">Controller_crearItinerario</prop>
+                 <prop key="registrar_itinerario.htm">Controller_crearItinerario</prop>
+                 
+                <prop key="consultar_itinerario.htm">Controller_consultarItinerario</prop>
+                <prop key="obtener_datos_itinerario.htm">Controller_consultarItinerario</prop>
+                <prop key="editar_itinerario.htm">Controller_consultarItinerario</prop>
+                <prop key="deshabilitar_itinerario.htm">Controller_consultarItinerario</prop>
+                <prop key="eliminar_itinerario.htm">Controller_consultarItinerario</prop>
+                
+                <!-- ALERTAS -->
+                <prop key="alerta.htm">Controller_alerta</prop>
+                <prop key="buscar_unidad_alerta.htm">Controller_alerta</prop>
+                <prop key="obtener_unidad_alerta.htm">Controller_alerta</prop>
+                <prop key="obtener_datos_alerta.htm">Controller_alerta</prop>
+                <prop key="configurar_alerta.htm">Controller_configurarAlerta</prop>
+                
+                <!-- REPORTES -->
+                <prop key="reporte_alerta.htm">Controller_reporteAlerta</prop>
+                <prop key="reporte_parada.htm">Controller_reporteParada</prop>
+                <prop key="reporte_vuelta.htm">Controller_reporteVuelta</prop>
+                <prop key="reporte_evaluar_unidad.htm">Controller_reporteEvaluarUnidad</prop>
+                
+                <prop key="listar_autos_interfazPrincipal.htm">Controller_index</prop>
+                <prop key="lecturas_vehiculo.htm">lectura_vehiculoController</prop>
+                <prop key="lecturas_vehiculo_detalle.htm">lectura_vehiculo_detalleController</prop>
+                <prop key="consultar_vehiculo.htm">lectura_vehiculoController</prop>
+                <prop key="lecturas_arco.htm">lectura_arcoController</prop>
+                <prop key="lecturas_arco_detalle.htm">lectura_arco_detalleController</prop>
+                <prop key="consultar_alertas_arcos.htm">lectura_arcoController</prop>
+                <prop key="logout.htm">loginController</prop>
+             
+            </props>
+        </property>
+    </bean>
+
+    <bean id="viewResolver"
+          class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+          p:prefix="/WEB-INF/jsp/"
+          p:suffix=".jsp" />
+
+    <!--
+    The index controller.
+    --> 
+    <bean name="Controller_index" class="Controllers.index" />
+    <bean name="loginController" class="Controllers.Login"/>
+    
+    <!-- GPS -->
+    <bean name="Controller_asociarGPS" class="Controllers.asociar_gps"/>
+    <bean name="Controller_consultarGPS" class="Controllers.consultar_gps"/>
+    <bean name="Controller_eliminarGPS" class="Controllers.eliminar_gps"/>
+    
+    <!-- CAPAS -->
+    <bean name="Controller_crearCapa" class="Controllers.crear_capa"/>
+    <bean name="Controller_consultarCapa" class="Controllers.consultar_capa"/>
+    
+    <!-- RUTAS -->
+    <bean name="Controller_crearRuta" class="Controllers.crear_ruta"/>
+    <bean name="Controller_consultarRuta" class="Controllers.consultar_ruta"/>
+    
+    <!-- RAMALES -->
+    <bean name="Controller_crearRamal" class="Controllers.crear_ramal"/>
+    <bean name="Controller_consultarRamal" class="Controllers.consultar_ramal"/>
+    
+    <!-- ITINERARIOS -->
+    <bean name="Controller_crearItinerario" class="Controllers.crear_itinerario"/>
+    <bean name="Controller_consultarItinerario" class="Controllers.consultar_itinerario"/>
+    
+    <!-- ALERTAS -->
+    <bean name="Controller_alerta" class="Controllers.alerta"/>
+    <bean name="Controller_configurarAlerta" class="Controllers.configurar_alerta"/>
+    
+    <!-- REPORTE -->
+    <bean name="Controller_reporteAlerta" class="Controllers.reporte_alerta"/>
+    <bean name="Controller_reporteParada" class="Controllers.reporte_parada"/>
+    <bean name="Controller_reporteVuelta" class="Controllers.reporte_vuelta"/>
+    <bean name="Controller_reporteEvaluarUnidad" class="Controllers.reporte_evaluar_unidad"/>
+    
+    <bean name="lectura_vehiculoController" class="Controllers.lectura_vehiculo"/>
+    <bean name="lectura_vehiculo_detalleController" class="Controllers.lectura_vehiculo_detalle"/>
+    <bean name="lectura_arcoController" class="Controllers.lectura_arco"/>
+    <bean name="lectura_arco_detalleController" class="Controllers.lectura_arco_detalle"/>
+
+    
+    <bean name="indexController"
+          class="org.springframework.web.servlet.mvc.ParameterizableViewController"
+          p:viewName="index11" />
+
+</beans>
+
