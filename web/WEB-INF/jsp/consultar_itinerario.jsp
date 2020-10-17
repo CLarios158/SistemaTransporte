@@ -1,13 +1,8 @@
-<%@page import="java.util.Iterator"%>
-<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@page import="Model.lectura_vehiculo"%>
-<%@page import="java.util.List"%>
-<%@page import="ModelDAO.lectura_vehiculoDAO"%>
 <%@page import="Config.Conexion"%>
 <%@page import="java.sql.ResultSet"%>
 <%@page import="java.sql.SQLException"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -112,12 +107,21 @@
                 </nav>
                 <div class="card main-slide-menu-card"> 
                     <div class="card-body">
-                        <div id="mostrar-itinerario">
+                        <!--<div id="mostrar-itinerario">
                             <div class="form-group"><h5 class="center text-white">ITINERARIOS</h5></div>
                             <div id="itinerarios" class="form-group row"></div>
+                        </div>-->
+                        <div id="buscar-itinerario" class=" row">
+                            <label class="col-sm-12" for="Buscar">Buscar itinerario:</label>
+                            <div class="col-sm-12 input-icons">
+                                <i class="fas fa-search icon-input"></i>
+                                <input type="text" class="form-control" name="buscarItinerario" id="buscarItinerario" autocomplete="off">
+                                <div style="z-index: 2; position: absolute; width: 90%;" class="list-group" id="show-list"></div>
+                            </div>
                         </div>
                         <div id="editar-itinerario" style="display: none;">
                             <input id="itin-seleccionada" name="itin-seleccionada" hidden />
+                            <input id="estatus" name="estatus" hidden />
                             <input id="id_itinerario" name="id_itinerario" hidden />
                             <div class="form-group row ">
                                 <label for="nombre" class="col-sm-4 col-form-label">Nombre:</label>
@@ -130,16 +134,9 @@
                                 <div class="col-sm-8">
                                     <select class="form-control" id="selectRuta" name="selectRuta">
                                         <option value="empty"></option>
-                                        <%
-                                            try {
-                                                ResultSet r = Conexion.query("SELECT id_ruta, nombre FROM cat_ruta;");
-                                                while (r.next()) {%>
-                                                    <option value=<%= r.getString(1)%>><%= r.getString(2)%></option>
-                                        <%}
-                                                r.close();
-                                            } catch (Exception e) {
-                                            }
-                                        %>
+                                        <c:forEach var="ruta_p" items="${rutas_option}">
+                                            <option value=${ruta_p.getId_ruta()}>${ruta_p.getNombre()}</option>
+                                        </c:forEach>
                                     </select>
                                 </div>                            
                             </div>
@@ -148,7 +145,7 @@
                                 <div class="col-sm-8 input-icons">
                                     <i class="fas fa-search icon-input"></i>
                                     <input type="text" class="form-control" name="buscarUnidad" id="buscarUnidad" autocomplete="off">
-                                    <div style="z-index: 2; position: absolute; width: 90%;" class="list-group" id="show-list"></div>
+                                    <div style="z-index: 2; position: absolute; width: 90%;" class="list-group" id="show-list-unidades"></div>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -189,12 +186,12 @@
                                 </div> 
                                 <div  class="row">
                                     <div class="col center"><label for="editar">Editar</label></div>
-                                    <div class="col center"><label for="deshabilitar">Deshabilitar</label></div>
+                                    <div class="col center"><label id="nombre-status"  for="deshabilitar"></label></div>
                                     <div class="col center"><label for="elimnar">Eliminar</label></div>
                                 </div>
                             </div>
                             <div id="guardar-itinerario" class="center" style="display: none;">
-                                <button id="btn-cancelar" class="btn btn-outline-primary">Cancelar</button>
+                                <button id="btn-cancelar" type="button" class="btn btn-outline-primary">Cancelar</button>
                                 <button id="btn-guardar" type="submit" class="btn btn-primary btn-small">Guardar</button>
                             </div>
                     </div>
@@ -335,11 +332,11 @@
                             <div class="col center"><i style="color: #c82333;" class="fas fa-exclamation-circle fa-2x"></i></div>
                         </div>
                         <div class="row">
-                            <div class="col center"><h5 class="text-white">Deshabilitar Itinerario</div>
+                            <div class="col center"><h5 class="text-white" id="title"></h5></div>
                         </div>
                         <div class="separator center"></div>
                         <div class="row">
-                            <div class="col center"><p style="color: #f8e71c; font-weight: bold; font-size: 12px;">¿Desea deshabilitar el itinerario </p><p style="color: #f8e71c; font-weight: bold; font-size: 12px;" id="itinSeleccionada"></p></div>
+                            <div class="col center"><p style="color: #f8e71c; font-weight: bold; font-size: 14px;" id="itinSeleccionada"></p></div>
                         </div>
                         <div class="row">
                             <div class="col text-right"><button class="btn btn-primary" data-dismiss="modal"><i class="fas fa-times"></i>Cancelar</button></div>
@@ -363,10 +360,10 @@
                         </div>
                         <div class="separator center"></div>
                         <div class="row">
-                            <div class="col center"><p style="font-size: 12px;">Si elimina este itinerario se eliminará la información que esta contiene junto con sus elementos asociados</p></div>
+                            <div class="col center"><p style="font-size: 14px;">Si elimina este itinerario se eliminará la información que esta contiene junto con sus elementos asociados</p></div>
                         </div>
                         <div class="row">
-                            <div class="col center"><p style="color: #f8e71c; font-weight: bold; font-size: 12px;">¿Desea eliminar el itinerario</p><p style="color: #f8e71c; font-weight: bold; font-size: 12px;" id="itinSeleccionada2"></p></div>
+                            <div class="col center"><p style="color: #f8e71c; font-weight: bold; font-size: 14px;">¿Desea eliminar el</p><p style="color: #f8e71c; font-weight: bold; font-size: 14px;" id="itinSeleccionada2"></p></div>
                         </div>
                         <div class="row">
                             <div class="col text-right"><button class="btn btn-primary" data-dismiss="modal"><i class="fas fa-times"></i>Cancelar</button></div>
@@ -386,11 +383,11 @@
                             <div class="col center"><i style="color: #28a745;" class="fas fa-check-circle fa-2x"></i></div>
                         </div>
                         <div class="row">
-                            <div class="col center"><h4 class="text-white">Exito</h4></div>
+                            <div class="col center"><h5 class="text-white">Exito</h5></div>
                         </div>
                         <div class="separator center"></div>
                         <div class="row">
-                            <div class="col center"><p style="color: #f8e71c; font-weight: bold; font-size: 12px;" id="msgExito"></p></div>
+                            <div class="col center"><p style="color: #f8e71c; font-weight: bold; font-size: 14px;" id="msgExito"></p></div>
                         </div>
                         <div class="row">
                             <div class="col center"><button class="btn btn-primary" data-dismiss="modal">Aceptar</button></div> 
@@ -656,12 +653,19 @@
         <!-- Funcionalidad de los botones -->
         <script type = "text/javascript">
             
-            $('#cancelar').click(function () {
+            $('#btn-cancelar').click(function () {
                 location.reload();
             });
             
             $('#modalDeshabilitar').click(function () {
-                document.getElementById("itinSeleccionada").innerHTML = "&nbsp"+$("#itin-seleccionada").val()+"?"; 
+                var estatus = $("#estatus").val();
+                if(estatus === '1'){
+                    document.getElementById("title").innerHTML = "Deshabilitar Itinerario";
+                    document.getElementById("itinSeleccionada").innerHTML = "¿Desea deshabilitar el"+"&nbsp"+$("#itin-seleccionada").val()+"?"; 
+                } else{
+                    document.getElementById("title").innerHTML = "Habilitar Itinerario";
+                    document.getElementById("itinSeleccionada").innerHTML = "¿Desea habilitar el"+"&nbsp"+$("#itin-seleccionada").val()+"?"; 
+                }
                 $('#deshabilitarItinerario').modal('show');
             });
             
@@ -677,12 +681,15 @@
             $(document).ready(function () {
                 $("#buscarUnidad").keyup(function (e) {
                     e.preventDefault();
+                    
                     var unidad = $(this).val();
+                    var id_ruta = $("#selectRuta").val();
+                    
                     if (unidad !== '') {
                         $.ajax({
-                            url: 'buscar_unidad.htm',
+                            url: 'buscar_unidad_itinerario.htm',
                             type: "GET",
-                            data: {unidad: unidad},
+                            data: { unidad: unidad, id_ruta: id_ruta },
                             success: function (data) {
                                 if (data.length > 0) {
                                     var lista = "";
@@ -690,14 +697,14 @@
                                         lista += '<a id="click-unidad" href="#" data-id="' + data[i].id_unidad + '" class="list-group-item list-group-item-action border-1">' + data[i].no_unidad + '</a>';
                                     }
 
-                                    $("#show-list").html(lista);
+                                    $("#show-list-unidades").html(lista);
                                 } else {
-                                    $("#show-list").html('<a href="#" class="list-group-item list-group-item-action border-1">No se encontro la unidad</a>');
+                                    $("#show-list-unidades").html('<a href="#" class="list-group-item list-group-item-action border-1">No se encontro la unidad</a>');
                                 }
 
                             }});
                     } else {
-                        $("#show-list").html('');
+                        $("#show-list-unidades").html('');
                     }
                 });
 
@@ -706,53 +713,77 @@
 
                     $("#buscarUnidad").val('');
                     var id = $(this).data("id");
+                    $("#id_unidad").val(id);
                     var button = '<button id="eliminarUnidad" class="btn btn-unidades">Unidad ' + $(this).text() + '</button>';
                     $("#unidades").html(button);
-                    $("#show-list").html('');
+                    $("#show-list-unidades").html('');
                 });
             });
         </script>
         
-        <!-- Obtener itinerarios -->
+        <!--Buscar Itinerario -->
         <script type="text/javascript">
             $(document).ready(function () {
-                var itinerarios = "";
-                <c:forEach var="itinerarios" items="${itinerarios}">
-                    itinerarios += '\
-                        <div id="seleccionado" class="col-sm-3" style="height: 50px; margin-bottom: 10px;">\n\
-                            <div  class="center" >\n\
-                                <div>\n\
-                                    <a id="click-itinerario" data-value="${itinerarios.getNombre()}" data-id="${itinerarios.getId()}" href="#"><i style="font-size: 18px;" class="fas fa-clipboard-list"></i></a>\n\
-                                </div>\n\
-                            </div>\n\
-                            <div id="seleccionado2" class="center"><p style="font-size: 12px; text-align: center;">${itinerarios.getNombre()}</p></div>\n\
-                        </div>';
-                </c:forEach>
-
-                $("#itinerarios").append(itinerarios);
-
-                $(document).on('click', 'a[id=click-itinerario]', function (e) {
+                $("#buscarItinerario").keyup(function(e){
                     e.preventDefault();
+                   
+                   var itinerario = $(this).val();
+                   if(itinerario !== ''){
+                       $.ajax({
+                            url: 'buscar_itinerario.htm',
+                            type: "GET",
+                            data: { itinerario: itinerario }, 
+                        success: function (data) {
+                            if(data.length > 0){
+                                var lista = "";
+                                for (i in data) {
+                                    lista += '<a id="click-itine" href="#" data-status="'+data[i].estatus+'" data-value="'+data[i].nombre+'" data-id="'+data[i].id_itinerario+'" class="list-group-item list-group-item-action border-1">'+data[i].nombre+'</a>';
+                                }
+                                $("#show-list").html(lista);
+                            } else {
+                                $("#show-list").html('<a href="#" class="list-group-item list-group-item-action border-1">No se encontro el itinerario</a>');
+                            }
+                              
+                        }});
+                    }else{
+                        $("#show-list").html('');
+                    }
+                });
+                
+                $(document).on('click','a[id=click-itine]', function(e){
+                    
+                    $("#buscarItinerario").val($(this).text());
+                    var id_itinerario = $(this).data("id");
+                    var itinerario_seleccionada = $(this).data('value');
+                    var status = $(this).data('status');
+                    if(status === 1){
+                        document.getElementById("nombre-status").innerHTML = "Deshabilitar";
+                    } else{
+                        document.getElementById("nombre-status").innerHTML = "Habilitar";
+                    }
+                    
+                    $("#estatus").val(status);
+                    $("#id_itinerario").val(id_itinerario);
+                    $("#itin-seleccionada").val(itinerario_seleccionada);
                     
                     $("#opciones-itinerario").show();
-                    var id_itinerario = $(this).data("id");
-                    var itin_seleccionada = $(this).data('value');
-                    $("#id_itinerario").val(id_itinerario);
-                    $("#itin-seleccionada").val(itin_seleccionada);
-
+                    $("#show-list").html('');
+                    
                 });
+                
+                
             });
         </script>
         
-         <!-- Obtener los Datos del Itinerario -->
+        <!-- Editar Itinerario -->
         <script type = "text/javascript">
             
             $('#btn-editar').click(function (e) {
                 
+                e.preventDefault();
+                
+                $("#buscar-itinerario").hide();
                 $("#opciones-itinerario").hide();
-                $("#mostrar-itinerario").hide();
-                $("#guardar-itinerario").show();
-                $("#editar-itinerario").show();
                 $("#paleta-colores").show();
                 $("#borrar-ruta").show();
                 
@@ -764,6 +795,8 @@
                     dataType: 'json',
                     data: {id_itinerario: id_itinerario},
                     success: function (data) {
+                        $("#editar-itinerario").show();
+                        $("#guardar-itinerario").show();
                         
                         $("#nombre").val(data.nombre);
                         document.getElementById("selectRuta").value = data.id_ruta;
@@ -808,6 +841,14 @@
                 e.preventDefault();
                 
                 var id_itinerario = $("#id_itinerario").val();
+                var estatus = $("#estatus").val();
+                    
+                if(estatus === '1'){
+                    estatus = '0';
+                } else{
+                    estatus = '1';
+                }
+                
                 var currentDate = new Date();
                 var fecha_actualizacion = currentDate.getFullYear() + "-" + (('0' + (currentDate.getMonth() + 1)).slice(-2)) + "-" + ('0' + currentDate.getDate()).slice(-2) + " " + ("0" + currentDate.getHours()).slice(-2) + ":" + ("0" + currentDate.getMinutes()).substr(-2) + ":" + currentDate.getSeconds();        
                 
@@ -817,15 +858,19 @@
                     dataType: 'json',
                     data: {
                         id_itinerario: id_itinerario,
-                        statusItinerario: 0,
+                        statusItinerario: estatus,
                         fecha_actualizacion: fecha_actualizacion
                     },
                     success: function (data) {
                         var nombre = data.nombre;
-                        document.getElementById("msgExito").innerHTML = "Se ha deshabilitado el itinerario"+"&nbsp"+nombre; 
+                        if(estatus === '1'){
+                            document.getElementById("msgExito").innerHTML = "Se ha habilitado el"+"&nbsp"+nombre;
+                        } else{
+                            document.getElementById("msgExito").innerHTML = "Se ha deshabilitado el"+"&nbsp"+nombre;
+                        }
                         $('#modalExito').modal('show');
                         $('#modalExito').on('hidden.bs.modal', function () {
-                            //location.reload();
+                            location.reload();
                         });
                     }
                 });
@@ -847,7 +892,7 @@
                         id_itinerario: id_itinerario
                     },
                     success: function (data) {
-                        document.getElementById("msgExito").innerHTML = "Se ha eliminado el itinerario"+"&nbsp"+$("#itin-seleccionada").val(); 
+                        document.getElementById("msgExito").innerHTML = "Se ha eliminado el itinerario correctamente"; 
                         $('#modalExito').modal('show');
                         $('#modalExito').on('hidden.bs.modal', function () {
                             location.reload();
@@ -897,8 +942,7 @@
                         fecha_actualizacion: fecha_actualizacion
                     },
                     success: function (data) {
-                        var nombre = data.nombre;
-                        document.getElementById("msgExito").innerHTML = "Se ha actualizado los datos del itinerario"+"&nbsp"+nombre; 
+                        document.getElementById("msgExito").innerHTML = "Se ha actualizado los datos del"+"&nbsp"+nombre; 
                         $('#modalExito').modal('show');
                         $('#modalExito').on('hidden.bs.modal', function () {
                             location.reload();

@@ -6,14 +6,15 @@
 package Controllers;
 
 import Config.Conexion;
-import Model.Itinerario;
 import java.io.IOException; 
 import java.io.PrintWriter;
-import java.sql.Connection;
+import java.sql.Statement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,45 +32,83 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @author Carlos Larios
  */
 public class consultar_itinerario {
-    private Conexion connec;
-    Conexion cn = new Conexion();
-    Connection con;
+    
     PreparedStatement ps;
     ResultSet rs;
-    Model.lectura_vehiculo lv = new Model.lectura_vehiculo();
-   
+    Statement s;
     
     @RequestMapping("consultar_itinerario.htm")
-    protected org.springframework.web.servlet.ModelAndView index(HttpServletResponse response, HttpServletRequest request) throws IOException {
+    protected org.springframework.web.servlet.ModelAndView index(HttpServletResponse response, HttpServletRequest request) throws IOException, SQLException {
+        
+        Conexion Conexion = new Conexion();
+        
         HttpSession session = request.getSession(false);
         org.springframework.web.servlet.ModelAndView mav = new org.springframework.web.servlet.ModelAndView();
-        
+
         mav.setViewName("consultar_itinerario");
-        ArrayList<Itinerario> itinerarios = new ArrayList<>();
+         
+        ArrayList<Model.consultar_ruta> rutas_option;
+        rutas_option = new ArrayList<>();
         
         try {
-            rs = Conexion.query("SELECT id_itinerario,nombre FROM cat_itinerario;");
-             
-             while(rs.next()){
-                itinerarios.add(new Itinerario( 
-                    rs.getInt(1), 
-                    rs.getString(2)    
-                ));  
-            }
-             
-            //rs.close();
+            rs = Conexion.query("SELECT id_ruta, nombre FROM cat_ruta;");
             
-            mav.addObject("itinerarios", itinerarios);
+            while(rs.next()){ 
+                rutas_option.add(new Model.consultar_ruta(
+                    rs.getInt("id_ruta"),
+                    rs.getString("nombre")
+                ));
+            }
+            
+            mav.addObject("rutas_option", rutas_option);
             
         } catch (SQLException e) {
             System.err.print(e);
+        } finally {
+            if (Conexion != null) { Conexion.executeQueryClose(); System.out.println("close conexion"); }
+            if (rs != null) { rs.close(); System.out.println("close rs"); }  
         }
         
         return mav;
     }
+   
+    @RequestMapping(value = "buscar_itinerario.htm", method = RequestMethod.GET)
+    public void buscar_itinerario(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
+        
+        Conexion Conexion = new Conexion();
+        
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+        
+        String itinerario = request.getParameter("itinerario");
+                 
+        JSONArray unidades = new JSONArray();
+        
+        try {
+            rs = Conexion.query("SELECT id_itinerario,nombre,\"statusItinerario\" FROM cat_itinerario WHERE nombre::text iLIKE '%"+itinerario+"%'");
+            
+            while(rs.next()){ 
+                Map m = new LinkedHashMap(2);
+                m.put("id_itinerario", rs.getString(1));
+                m.put("nombre", rs.getString(2)); 
+                m.put("estatus", rs.getString(3)); 
+                unidades.add(m);
+            }
+            
+        } catch (SQLException e) {
+            System.err.print(e);
+        } finally {
+            if (Conexion != null) { Conexion.executeQueryClose(); System.out.println("close conexion"); }
+            if (rs != null) { rs.close(); System.out.println("close rs"); }  
+        }
+        
+        out.println(unidades);
+    }
     
     @RequestMapping(value = "obtener_datos_itinerario.htm", method = RequestMethod.POST)
-    public void obtener_datos_itinerario(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void obtener_datos_itinerario(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
+        
+        Conexion Conexion = new Conexion();
         
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
@@ -90,20 +129,24 @@ public class consultar_itinerario {
                 datos.put("no_unidad", rs.getString(6));   
             }
             
-            rs.close();
-            
             JSONParser parser = new JSONParser();
             JSONArray json = (JSONArray) parser.parse(kmz);
             datos.put("kmz",json);
             
         } catch (SQLException | JSONException | ParseException e) {
             System.err.print(e);
+        } finally {
+            if (Conexion != null) { Conexion.executeQueryClose(); System.out.println("close conexion"); }
+            if (rs != null) { rs.close(); System.out.println("close rs"); }  
         }
+
         out.println(datos);
     }
     
     @RequestMapping(value = "deshabilitar_itinerario.htm", method = RequestMethod.POST)
-    public void deshabilitar_itinerario(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void deshabilitar_itinerario(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
+        
+        Conexion Conexion = new Conexion();
         
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
@@ -115,23 +158,39 @@ public class consultar_itinerario {
         JSONObject datos = new JSONObject();
         
         try {
-            rs = Conexion.query("UPDATE cat_itinerario SET \"statusItinerario\" = '"+statusItinerario+"', fecha_actualizacion = '"+fecha_actualizacion+"' WHERE id_itinerario = "+id_itinerario+"  RETURNING id_itinerario, nombre;");
             
-            while(rs.next()){
-                datos.put("id_itinerario", rs.getString(1));
-                datos.put("nombre", rs.getString(2)); 
-            }
+            s = Conexion.update("UPDATE cat_itinerario SET \"statusItinerario\" = '"+statusItinerario+"', fecha_actualizacion = '"+fecha_actualizacion+"' WHERE id_itinerario = "+id_itinerario+"  RETURNING id_itinerario, nombre;");
+            rs = s.getGeneratedKeys();
             
-            rs.close();  
-            
-        } catch (SQLException | JSONException e) {
+        } catch (SQLException e) {
             System.err.print(e);
+        } finally {
+            if (Conexion != null) { Conexion.executeQueryCloseUpdate(); System.out.println("close conexion"); }
+            if (rs != null) { rs.close(); System.out.println("close rs"); }
         }
+        
+        try {
+
+            rs = Conexion.query("SELECT nombre FROM cat_itinerario WHERE id_itinerario = "+id_itinerario+"");
+            
+            while(rs.next()){ 
+                datos.put("nombre", rs.getString(1));
+            }
+           
+        } catch (SQLException | JSONException e) {
+            System.err.print("ERROR:"+e);
+        } finally {
+            if (Conexion != null) { Conexion.executeQueryClose(); System.out.println("close conexion"); }
+            if (rs != null) { rs.close(); System.out.println("close rs"); }   
+        }
+        
         out.println(datos);
     }
     
     @RequestMapping(value = "eliminar_itinerario.htm", method = RequestMethod.POST)
     public void eliminar_itinerario(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        
+        Conexion Conexion = new Conexion();
         
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
@@ -141,23 +200,24 @@ public class consultar_itinerario {
         JSONObject datos = new JSONObject();
         
         try {
-            rs = Conexion.query("DELETE FROM cat_itinerario WHERE id_itinerario = "+id_itinerario+"  RETURNING 0;");
             
-            while(rs.next()){
-                datos.put("estado", 1);
-            }
+            s = Conexion.update("DELETE FROM cat_itinerario WHERE id_itinerario = "+id_itinerario+";");
             
-            rs.close();
+            datos.put("exito", 1); 
             
-        } catch (SQLException | JSONException e) {
+        } catch (JSONException e) {
             System.err.print(e);
+        } finally {
+            if (Conexion != null) { Conexion.executeQueryCloseUpdate(); System.out.println("close conexion"); }  
         }
         
         out.println(datos);
     }
     
     @RequestMapping(value = "editar_itinerario.htm", method = RequestMethod.POST)
-    public void editar_itinerario(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void editar_itinerario(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
+        
+        Conexion Conexion = new Conexion();
         
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
@@ -172,17 +232,15 @@ public class consultar_itinerario {
         JSONObject datos = new JSONObject(); 
         
         try {
-            rs = Conexion.query("UPDATE cat_itinerario SET nombre = '"+nombre+"', id_ruta = "+id_ruta+", id_unidad = "+id_unidad+", \"KMZ\" = '"+kmz+"', fecha_actualizacion = '"+fecha_actualizacion+"' WHERE id_itinerario = "+id_itinerario+" RETURNING id_itinerario, nombre;");
             
-            while(rs.next()){
-                datos.put("id_itinerario", rs.getString(1));
-                datos.put("nombre", rs.getString(2));
-            }
+            s = Conexion.update("UPDATE cat_itinerario SET nombre = '"+nombre+"', id_ruta = "+id_ruta+", id_unidad = "+id_unidad+", \"KMZ\" = '"+kmz+"', fecha_actualizacion = '"+fecha_actualizacion+"' WHERE id_itinerario = "+id_itinerario+";");
+            rs = s.getGeneratedKeys();
             
-            rs.close();
-            
-        } catch (SQLException | JSONException e) {
+        } catch (SQLException e) {
             System.err.print(e);
+        } finally {
+            if (Conexion != null) { Conexion.executeQueryCloseUpdate(); System.out.println("close conexion"); }
+            if (rs != null) { rs.close(); System.out.println("close rs"); }
         }
         
         out.println(datos);

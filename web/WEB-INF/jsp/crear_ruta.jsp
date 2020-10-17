@@ -1,13 +1,8 @@
-<%@page import="java.util.Iterator"%>
-<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@page import="Model.lectura_vehiculo"%>
-<%@page import="java.util.List"%>
-<%@page import="ModelDAO.lectura_vehiculoDAO"%>
 <%@page import="Config.Conexion"%>
 <%@page import="java.sql.ResultSet"%>
 <%@page import="java.sql.SQLException"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -113,13 +108,14 @@
                                 <label for="nombre" class="col-sm-4 col-form-label">Nombre:</label>
                                 <div class="col-sm-8">
                                     <input type="text" class="form-control" name="nombre" id="nombre" autocomplete="off" onkeyup="validarRuta(this);">
-                                    <p id="errorRuta" style="color: #F8E71C; font-size: 12px; height: 0px;"></p>
+                                    <p id="errorRuta" style="color: #F8E71C; font-size: 12px; height: 0px; display: none;"></p>
                                 </div>
                             </div>
                             <div class="form-group row ">
                                 <label for="numero" class="col-sm-4 col-form-label">Número:</label>
                                 <div class="col-sm-8">
                                     <input type="text" class="form-control" name="numero" id="numero" autocomplete="off">
+                                    <p id="errorNumero" style="color: #F8E71C; font-size: 12px; height: 0px; display: none;"></p>
                                 </div>
                             </div>
                             <div class="form-group row ">
@@ -127,17 +123,11 @@
                                 <div class="col-sm-8">
                                     <select class="form-control" id="selectCapa" name="selectCapa" autocomplete="off">
                                         <option value="0"></option>
-                                        <%
-                                            try {
-                                                ResultSet r = Conexion.query("SELECT id_capa, nombre FROM cat_capa;");
-                                                while (r.next()) {%>
-                                                    <option value=<%= r.getString(1)%>><%= r.getString(2)%></option>
-                                        <%}
-                                                r.close();
-                                            } catch (Exception e) {
-                                            }
-                                        %>
+                                        <c:forEach var="capa_p" items="${capas_option}">
+                                            <option value=${capa_p.getId_capa()}>${capa_p.getNombre()}</option>
+                                        </c:forEach>
                                     </select>
+                                    <p id="errorCapa" style="color: #F8E71C; font-size: 12px; height: 0px; display: none;"></p>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -146,6 +136,7 @@
                                     <i class="fas fa-search icon-input"></i>
                                     <input type="text" class="form-control" name="buscarUnidad" id="buscarUnidad" autocomplete="off">
                                     <div style="z-index: 2; position: absolute; width: 90%;" class="list-group" id="show-list"></div>
+                                    <p id="errorUnidad" style="color: #F8E71C; font-size: 12px; height: 0px; display: none;"></p>
                                 </div>
                             </div>
                              <div class="form-group row">
@@ -156,6 +147,7 @@
                                     <div  id="unidades"></div>
                                 </div>
                             </div>
+                            <p id="errorKMZ" style="color: #F8E71C; font-size: 12px; height: 0px; display: none;"></p>
                             <input hidden type="text" id="kmz" name="kmz">
                             <input hidden type="text" id="unidadesA" name="unidadesA" />
                         </div>
@@ -301,11 +293,11 @@
                             <div class="col center"><i style="color: #28a745;" class="fas fa-check-circle fa-2x"></i></div>
                         </div>
                         <div class="row">
-                            <div class="col center"><h4 class="text-white">Exito</h4></div>
+                            <div class="col center"><h5 class="text-white">Exito</h5></div>
                         </div>
                         <div class="separator center"></div>
                         <div class="row">
-                            <div class="col center"><p style="color: #f8e71c; font-weight: bold; font-size: 12px;" id="msgExito"></p></div>
+                            <div class="col center"><p style="color: #f8e71c; font-weight: bold; font-size: 14px;" id="msgExito"></p></div>
                         </div>
                         <div class="row">
                             <div class="col center"><button class="btn btn-primary" data-dismiss="modal">Aceptar</button></div> 
@@ -586,14 +578,14 @@
                         }
                 });
                 
-                let array = [];
+                var array = [];
                 
                 $(document).on('click','a[id=click-unidad]', function(){
                     $("#buscarUnidad").val('');
                     var id =  $(this).data("id");
                     array.push(id);
                     document.getElementById("unidadesA").value = JSON.stringify(array);
-                    var button = '<button id="eliminarUnidad" class="btn btn-unidades">Unidad '+$(this).text()+' <i class="fas fa-times"></i></button>';
+                    var button = '<a href="#" data-id="'+id+'" id="eliminarUnidad" type="button" class="btn btn-unidades">Unidad '+$(this).text()+' <i class="fas fa-times-circle"></i></a>';
                     //var fila = '<tr><td style="padding: 3px;">Unidad '+$(this).text()+'</td><td><center><i class="fas fa-times-circle"></i></center></td></tr>';
                     $("#unidades").append(button);
                     $("#show-list").html('');
@@ -601,6 +593,22 @@
             });
         </script>
         
+        <script>
+            $(document).on('click','a[id=eliminarUnidad]', function(){
+                var index =  $(this).data("id");
+                var no_unidad = $(this).data("unidad");
+                var unidades = JSON.parse($("#unidadesA").val());
+                
+                for( var i = 0; i < unidades.length; i++){ 
+                    if ( unidades[i] === index) { 
+                        unidades.splice(i, 1); 
+                    }
+                }
+                $(this).remove();
+                document.getElementById("unidadesA").value = JSON.stringify(unidades);
+            });
+        </script>
+
         <!-- Validar Formulario -->
         <script type = "text/javascript">
             
@@ -611,29 +619,53 @@
             function validate() {
 
                 if (document.myForm.nombre.value === "") {
-                    alert("Por favor ingresa el nombre!");
+                    document.getElementById("errorRuta").innerHTML = "Por favor, ingrese el nombre.";
+                    $("#errorRuta").show();
                     document.myForm.nombre.focus();
                     return false;
+                }else{
+                    document.getElementById("errorRuta").innerHTML = "";
+                    $("#errorRuta").hide();
                 }
+                
                 if (document.myForm.numero.value === "") {
-                    alert("Por favor ingresa el número!");
+                    document.getElementById("errorNumero").innerHTML = "Por favor, ingrese el número.";
+                    $("#errorNumero").show();
                     document.myForm.numero.focus();
                     return false;
+                }else{
+                    document.getElementById("errorNumero").innerHTML = "";
+                    $("#errorNumero").hide();
                 }
+                
                 if (document.myForm.selectCapa.value === "" || document.myForm.selectCapa.value === "0") {
-                    alert("Por favor seleccione una capa!");
+                    document.getElementById("errorCapa").innerHTML = "Por favor, seleccione una capa.";
+                    $("#errorCapa").show();
                     document.myForm.selectCapa.focus();
                     return false;
+                }else{
+                    document.getElementById("errorCapa").innerHTML = "";
+                    $("#errorCapa").hide();
                 }
+                
                 if (document.myForm.unidadesA.value === "") {
-                    alert("Por favor asigne unidades a la ruta!");
+                    document.getElementById("errorUnidad").innerHTML = "Por favor, asigne unidades a la ruta.";
+                    $("#errorUnidad").show();
                     document.myForm.unidadesA.focus();
                     return false;
+                }else{
+                    document.getElementById("errorUnidad").innerHTML = "";
+                    $("#errorUnidad").hide();
                 }
+                
                 if (document.myForm.kmz.value === "") {
-                    alert("Por favor trace la ruta!");
+                    document.getElementById("errorKMZ").innerHTML = "Por favor, trace una ruta.";
+                    $("#errorKMZ").show();
                     document.myForm.kmz.focus();
                     return false;
+                }else{
+                    document.getElementById("errorKMZ").innerHTML = "";
+                    $("#errorKMZ").hide();
                 }
               
                 return(true);
@@ -671,8 +703,7 @@
                             fecha_registro: fecha_registro
                         }, 
                     success: function (data) {
-                        var nombre = data.nombre;
-                        document.getElementById("msgExito").innerHTML = "Se ha creado la ruta"+"&nbsp"+nombre; 
+                        document.getElementById("msgExito").innerHTML = "Se ha creado la "+"&nbsp"+nombre; 
                         $('#modalExito').modal('show');
                         $('#modalExito').on('hidden.bs.modal', function () {
                             location.reload();

@@ -43,6 +43,7 @@
                 <prop key="consultar_capa.htm">Controller_consultarCapa</prop>
                 <prop key="obtener_datos_capa.htm">Controller_consultarCapa</prop>
                 <prop key="editar_capa.htm">Controller_consultarCapa</prop>
+                <prop key="editar_capa_file.htm">Controller_consultarCapa</prop>
                 <prop key="deshabilitar_capa.htm">Controller_consultarCapa</prop>
                 <prop key="eliminar_capa.htm">Controller_consultarCapa</prop>
                 
@@ -62,6 +63,8 @@
                 
                 <!-- RAMALES -->
                 <prop key="crear_ramal.htm">Controller_crearRamal</prop>
+                <prop key="buscar_unidad_ruta.htm">Controller_crearRamal</prop>
+                <prop key="buscar_unidad_ramal.htm">Controller_crearRamal</prop>
                 <prop key="validar_ramal.htm">Controller_crearRamal</prop>
                 <prop key="registrar_ramal.htm">Controller_crearRamal</prop>
                 <prop key="obtener_kmz_ruta.htm">Controller_crearRamal</prop>
@@ -76,9 +79,11 @@
                 <!-- ITINERARIOS -->
                 <prop key="crear_itinerario.htm">Controller_crearItinerario</prop>
                 <prop key="validar_itinerario.htm">Controller_crearItinerario</prop>
-                 <prop key="registrar_itinerario.htm">Controller_crearItinerario</prop>
+                <prop key="registrar_itinerario.htm">Controller_crearItinerario</prop>
+                <prop key="buscar_unidad_itinerario.htm">Controller_crearItinerario</prop>
                  
                 <prop key="consultar_itinerario.htm">Controller_consultarItinerario</prop>
+                <prop key="buscar_itinerario.htm">Controller_consultarItinerario</prop>
                 <prop key="obtener_datos_itinerario.htm">Controller_consultarItinerario</prop>
                 <prop key="editar_itinerario.htm">Controller_consultarItinerario</prop>
                 <prop key="deshabilitar_itinerario.htm">Controller_consultarItinerario</prop>
@@ -89,21 +94,9 @@
                 <prop key="buscar_unidad_alerta.htm">Controller_alerta</prop>
                 <prop key="obtener_unidad_alerta.htm">Controller_alerta</prop>
                 <prop key="obtener_datos_alerta.htm">Controller_alerta</prop>
+                <prop key="obtener_datos_alerta_fecha.htm">Controller_alerta</prop>
                 <prop key="configurar_alerta.htm">Controller_configurarAlerta</prop>
                 
-                <!-- REPORTES -->
-                <prop key="reporte_alerta.htm">Controller_reporteAlerta</prop>
-                <prop key="reporte_parada.htm">Controller_reporteParada</prop>
-                <prop key="reporte_vuelta.htm">Controller_reporteVuelta</prop>
-                <prop key="reporte_evaluar_unidad.htm">Controller_reporteEvaluarUnidad</prop>
-                
-                <prop key="listar_autos_interfazPrincipal.htm">Controller_index</prop>
-                <prop key="lecturas_vehiculo.htm">lectura_vehiculoController</prop>
-                <prop key="lecturas_vehiculo_detalle.htm">lectura_vehiculo_detalleController</prop>
-                <prop key="consultar_vehiculo.htm">lectura_vehiculoController</prop>
-                <prop key="lecturas_arco.htm">lectura_arcoController</prop>
-                <prop key="lecturas_arco_detalle.htm">lectura_arco_detalleController</prop>
-                <prop key="consultar_alertas_arcos.htm">lectura_arcoController</prop>
                 <prop key="logout.htm">loginController</prop>
              
             </props>
@@ -145,19 +138,7 @@
     <!-- ALERTAS -->
     <bean name="Controller_alerta" class="Controllers.alerta"/>
     <bean name="Controller_configurarAlerta" class="Controllers.configurar_alerta"/>
-    
-    <!-- REPORTE -->
-    <bean name="Controller_reporteAlerta" class="Controllers.reporte_alerta"/>
-    <bean name="Controller_reporteParada" class="Controllers.reporte_parada"/>
-    <bean name="Controller_reporteVuelta" class="Controllers.reporte_vuelta"/>
-    <bean name="Controller_reporteEvaluarUnidad" class="Controllers.reporte_evaluar_unidad"/>
-    
-    <bean name="lectura_vehiculoController" class="Controllers.lectura_vehiculo"/>
-    <bean name="lectura_vehiculo_detalleController" class="Controllers.lectura_vehiculo_detalle"/>
-    <bean name="lectura_arcoController" class="Controllers.lectura_arco"/>
-    <bean name="lectura_arco_detalleController" class="Controllers.lectura_arco_detalle"/>
-
-    
+      
     <bean name="indexController"
           class="org.springframework.web.servlet.mvc.ParameterizableViewController"
           p:viewName="index11" />

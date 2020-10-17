@@ -1,13 +1,8 @@
-<%@page import="java.util.Iterator"%>
-<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@page import="Model.lectura_vehiculo"%>
-<%@page import="java.util.List"%>
-<%@page import="ModelDAO.lectura_vehiculoDAO"%>
 <%@page import="Config.Conexion"%>
 <%@page import="java.sql.ResultSet"%>
 <%@page import="java.sql.SQLException"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -107,52 +102,52 @@
                         <a class="color-label-bold" href="<c:url value="crear_capa.htm" />" >Consultar Capa</a>
                     </nav>
                     <div class="card main-slide-menu-card">
-                        
-                            <div class="card-body">
-                                    <div id="mostrar-capa">
-                                        <div class="form-group"><h5 class="center text-white">CAPAS</h5></div>
-                                        <div id="capas" class="form-group row"></div>
-                                    </div>
-                                    <div id="editar-capa" style="display: none;">
-                                        <input id="id_capa" name="id_capa" hidden />
-                                        <input id="capa-seleccionada" name="capa-seleccionada" hidden />
-                                        <div class="form-group row ">
-                                            <label for="nombre" class="col-sm-4 col-form-label">Nombre:</label>
-                                            <div class="col-sm-8">
-                                                <input type="text" class="form-control" name="nombre" id="nombre" autocomplete="off" onkeyup="validarCapa(this);">
-                                                <p id="errorCapa" style="color: #F8E71C; font-size: 12px; height: 0px;"></p>
-                                            </div>
-                                        </div>
-                                        <div class="form-group row ">
-                                            <label for="numero" class="col-sm-4 col-form-label">Adjuntar icono:</label>
-                                            <div class="col-sm-4">
-                                                <div class="upload-img" id="previewImg2"></div>
-                                                <input id="rutaFoto" name="rutaFoto" hidden>
-                                                <input type="file" id="file" name="file">
-                                                <label class="btn-file" for="file">Cargar</label>
-                                            </div>
-                                        </div>
-                                        <input hidden type="text" id="kmz" name="kmz">
-                                    </div>
-                            </div>
-                            <div class="card-footer" >
-                                <div id="opciones-capa" style="display: none;">
-                                    <div class="row card-actions">
-                                        <div class="col center"><button type="text" id="btn-editar" style="margin-right: 0;"><i class="fas fa-edit"></i></button></div>
-                                        <div class="col center"><button type="text" id="modalDeshabilitar"  style="margin-right: 0;"><i class="fas fa-ban"></i></button></div>
-                                        <div class="col center"><button type="text" id="modalEliminar" style="margin-right: 0;"><i class="fas fa-trash"></i></button></div>
-                                    </div> 
-                                    <div  class="row">
-                                        <div class="col center"><label for="editar">Editar</label></div>
-                                        <div class="col center"><label for="deshabilitar">Deshabilitar</label></div>
-                                        <div class="col center"><label for="elimnar">Eliminar</label></div>
-                                    </div>
+                        <div class="card-body">
+                                <div id="mostrar-capa">
+                                    <div class="form-group"><h5 class="center text-white">CAPAS</h5></div>
+                                    <div id="capas" class="form-group row"></div>
                                 </div>
-                                <div id="guardar-capa" class="center" style="display: none;">
-                                    <button class="btn btn-outline-primary">Cancelar</button>
-                                    <button id="btn-guardar" type="submit" class="btn btn-primary btn-small">Guardar</button>
+                                <div id="editar-capa" style="display: none;">
+                                    <input id="id_capa" name="id_capa" hidden />
+                                    <input id="capa-seleccionada" name="estatus" hidden />
+                                    <input id="estatus" name="capa-seleccionada" hidden />
+                                    <div class="form-group row ">
+                                        <label for="nombre" class="col-sm-4 col-form-label">Nombre:</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control" name="nombre" id="nombre" autocomplete="off" onkeyup="validarCapa(this);">
+                                            <p id="errorCapa" style="color: #F8E71C; font-size: 12px; height: 0px;"></p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row ">
+                                        <label for="numero" class="col-sm-4 col-form-label">Adjuntar icono:</label>
+                                        <div class="col-sm-4">
+                                            <div class="upload-img" id="previewImg2"></div>
+                                            <input id="rutaFoto" name="rutaFoto" hidden>
+                                            <input type="file" id="file" name="file">
+                                            <label class="btn-file" for="file">Cargar</label>
+                                        </div>
+                                    </div>
+                                    <input hidden type="text" id="kmz" name="kmz">
+                                </div>
+                        </div>
+                        <div class="card-footer" >
+                            <div id="opciones-capa" style="display: none;">
+                                <div class="row card-actions">
+                                    <div class="col center"><button type="text" id="btn-editar" style="margin-right: 0;"><i class="fas fa-edit"></i></button></div>
+                                    <div class="col center"><button type="text" id="modalDeshabilitar"  style="margin-right: 0;"><i class="fas fa-ban"></i></button></div>
+                                    <div class="col center"><button type="text" id="modalEliminar" style="margin-right: 0;"><i class="fas fa-trash"></i></button></div>
+                                </div> 
+                                <div  class="row">
+                                    <div class="col center"><label for="editar">Editar</label></div>
+                                    <div class="col center"><label id="nombre-status" for="deshabilitar"></label></div>
+                                    <div class="col center"><label for="elimnar">Eliminar</label></div>
                                 </div>
                             </div>
+                            <div id="guardar-capa" class="center" style="display: none;">
+                                <button class="btn btn-outline-primary">Cancelar</button>
+                                <button id="btn-guardar" type="submit" class="btn btn-primary btn-small">Guardar</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -291,11 +286,11 @@
                             <div class="col center"><i style="color: #c82333;" class="fas fa-exclamation-circle fa-2x"></i></div>
                         </div>
                         <div class="row">
-                            <div class="col center"><h5 class="text-white">Deshabilitar Capa</div>
+                            <div class="col center"><h5 class="text-white" id="title"></h5></div>
                         </div>
                         <div class="separator center"></div>
                         <div class="row">
-                            <div class="col center"><p style="color: #f8e71c; font-weight: bold; font-size: 12px;">¿Desea deshabilitar la capa </p><p style="color: #f8e71c; font-weight: bold; font-size: 12px;" id="capaSeleccionada"></p></div>
+                            <div class="col center"><p style="color: #f8e71c; font-weight: bold; font-size: 14px;" id="capaSeleccionada"></p></div>
                         </div>
                         <div class="row">
                             <div class="col text-right"><button class="btn btn-primary" data-dismiss="modal"><i class="fas fa-times"></i>Cancelar</button></div>
@@ -319,10 +314,10 @@
                         </div>
                         <div class="separator center"></div>
                         <div class="row">
-                            <div class="col center"><p style="font-size: 12px;">Si elimina esta capa se eliminará la información que esta contiene junto con sus elementos asociados</p></div>
+                            <div class="col center"><p style="font-size: 14px;">Si elimina esta capa se eliminará la información que esta contiene junto con sus elementos asociados</p></div>
                         </div>
                         <div class="row">
-                            <div class="col center"><p style="color: #f8e71c; font-weight: bold; font-size: 12px;">¿Desea eliminar la capa</p><p style="color: #f8e71c; font-weight: bold; font-size: 12px;" id="capaSeleccionada2"></p></div>
+                            <div class="col center"><p style="color: #f8e71c; font-weight: bold; font-size: 14px;">¿Desea eliminar la capa</p><p style="color: #f8e71c; font-weight: bold; font-size: 14px;" id="capaSeleccionada2"></p></div>
                         </div>
                         <div class="row">
                             <div class="col text-right"><button class="btn btn-primary" data-dismiss="modal"><i class="fas fa-times"></i>Cancelar</button></div>
@@ -342,11 +337,11 @@
                             <div class="col center"><i style="color: #28a745;" class="fas fa-check-circle fa-2x"></i></div>
                         </div>
                         <div class="row">
-                            <div class="col center"><h4 class="text-white">Exito</h4></div>
+                            <div class="col center"><h5 class="text-white">Exito</h5></div>
                         </div>
                         <div class="separator center"></div>
                         <div class="row">
-                            <div class="col center"><p style="color: #f8e71c; font-weight: bold; font-size: 12px;" id="msgExito"></p></div>
+                            <div class="col center"><p style="color: #f8e71c; font-weight: bold; font-size: 14px;" id="msgExito"></p></div>
                         </div>
                         <div class="row">
                             <div class="col center"><button class="btn btn-primary" data-dismiss="modal">Aceptar</button></div> 
@@ -367,12 +362,19 @@
 
 
         <script type="text/javascript">
-            let coordenadas = {lat: 19.243772, lng: -103.714532};
+            
+            var coords;
+            
+            coordinates({lat: 19.243772, lng: -103.714532});
+            
+            function coordinates(x){
+                coords = x;
+            }
             
             function initMap(coordenadas){
                 var map = new google.maps.Map(document.getElementById('map'), {
                     zoom: 13,
-                    center: coordenadas,
+                    center: coords,
                     styles: [
                         {elementType: 'geometry', stylers: [{color: '#03060c'}]},
                         {elementType: 'labels.text.stroke', stylers: [{color: '#0A1E28'}]},
@@ -458,8 +460,6 @@
                 return map;
             }
             
-            initMap(coordenadas);
-            
             function Polygon(path){
                 var poly = new google.maps.Polygon({
                     paths: path,
@@ -543,7 +543,14 @@
             });
             
             $('#modalDeshabilitar').click(function () {
-                document.getElementById("capaSeleccionada").innerHTML = "&nbsp"+$("#capa-seleccionada").val()+"?"; 
+                var estatus = $("#estatus").val();
+                if(estatus === '1'){
+                    document.getElementById("title").innerHTML = "Deshabilitar Capa";
+                    document.getElementById("capaSeleccionada").innerHTML = "¿Desea deshabilitar la capa"+"&nbsp"+$("#capa-seleccionada").val()+"?"; 
+                } else{
+                    document.getElementById("title").innerHTML = "Habilitar Capa";
+                    document.getElementById("capaSeleccionada").innerHTML = "¿Desea habilitar la capa"+"&nbsp"+$("#capa-seleccionada").val()+"?"; 
+                }
                 $('#deshabilitarCapa').modal('show');
             });
             
@@ -564,10 +571,10 @@
                         <div id="seleccionado" class="col-sm-3" style="height: 50px; margin-bottom: 10px;">\n\
                             <div  class="center" >\n\
                                 <div>\n\
-                                    <a id="click-capa" data-value="${capa.getNombre()}" data-id="${capa.getId()}" href="#"><img style="width: 20px; height: 20px; margin: 6px;" src="${capa.getIcon()}"/></a>\n\
+                                    <a id="click-capa" data-status="${capa.getEstatus()}" data-value="${capa.getNombre()}" data-id="${capa.getId()}" href="#"><img style="width: 20px; height: 20px; margin: 6px;" src="${capa.getIcon()}"/></a>\n\
                                 </div>\n\
                             </div>\n\
-                            <div class="center"><p style="font-size: 12px;">${capa.getNombre()}</p></div>\n\
+                            <div class="center"><p style="font-size: 12px; text-align: center;">${capa.getNombre()}</p></div>\n\
                         </div>';
                 </c:forEach>
 
@@ -576,11 +583,21 @@
                 $(document).on('click', 'a[id=click-capa]', function (e) {
                     e.preventDefault();
                     
-                    $("#opciones-capa").show();
                     var id_capa = $(this).data("id");
                     var capa_seleccionada = $(this).data('value');
+                    var status = $(this).data('status');
+                    
+                    if(status === 1){
+                        document.getElementById("nombre-status").innerHTML = "Deshabilitar";
+                    } else{
+                        document.getElementById("nombre-status").innerHTML = "Habilitar";
+                    }
+                    
                     $("#id_capa").val(id_capa);
                     $("#capa-seleccionada").val(capa_seleccionada);
+                    $("#estatus").val(status);
+                    
+                    $("#opciones-capa").show();
 
                 });
             });
@@ -628,6 +645,80 @@
             });
         </script>
         
+        <!-- Eliminar el area del mapa -->
+        <script>
+            $("#borrar-ruta").click(function () {
+                document.getElementById("kmz").value = "";
+                
+                var map = initMap();
+                var kmz = [];
+                var poly;
+                
+                poly = new google.maps.Polygon({
+                    strokeColor: '#FF0000',
+                    strokeOpacity: 0.8,
+                    strokeWeight: 3,
+                    fillColor: '#FF0000',
+                    fillOpacity: 0.35
+                });
+
+                poly.setMap(map);
+                
+                // Add a listener for the click event
+                map.addListener('click', addLatLng);
+
+                // Handles click events on a map, and adds a new point to the Polyline.
+                function addLatLng(event) {
+                    var path = poly.getPath();
+                    // Because path is an MVCArray, we can simply append a new coordinate
+                    // and it will automatically appear.
+                    path.push(event.latLng);
+                    kmz.push({lat: event.latLng.lat(), lng: event.latLng.lng()});
+                    kmzJSON = JSON.stringify(kmz);
+                    document.getElementById("kmz").value = kmzJSON;
+                    
+                    // Add a new marker at the new plotted point on the polyline.
+                    var marker = new google.maps.Marker({
+                        position: event.latLng,
+                        title: '#' + path.getLength(),
+                        map: map,
+                        draggable: true
+                    });
+                    
+                    google.maps.event.addListener(marker, "mousedown", function(event) {
+                        latG = event.latLng.lat();
+                        lngG = event.latLng.lng();
+                        console.log(latG);
+                    });
+                    
+                    google.maps.event.addListener(marker, 'dragend', function (m) {
+                        var lat = m.latLng.lat();
+                        var lng = m.latLng.lng();
+
+                        kmz.find(item=>item.lat === latG).lat = lat;
+                        kmz.find(item=>item.lng === lngG).lng = lng;
+                        
+                        document.getElementById("kmz").value = JSON.stringify(kmz);
+                        
+                        poly.setMap(null);
+                        poly = new google.maps.Polygon({
+                            path: kmz,
+                            strokeColor: '#FF0000',
+                            strokeOpacity: 0.8,
+                            strokeWeight: 3,
+                            fillColor: '#FF0000',
+                            fillOpacity: 0.35
+                        });
+                        
+                        poly.setMap(map);
+                        
+                        
+                    });
+                }
+               
+            });
+        </script>
+        
         <!-- Obtener los Datos de la Capa -->
         <script type = "text/javascript">
             
@@ -661,7 +752,8 @@
                             arrayKMZ.push(kmz[i]);
                         }
                         
-                        var map = initMap(arrayKMZ[0]);
+                        var coords = coordinates(arrayKMZ[0]);
+                        var map = initMap();
                         var poly = Polygon(arrayKMZ);
                         poly.setMap(map);
                         var markers = Marker(arrayKMZ, map);
@@ -678,6 +770,14 @@
                 e.preventDefault();
                 
                 var id_capa = $("#id_capa").val();
+                var estatus = $("#estatus").val();
+                    
+                if(estatus === '1'){
+                    estatus = '0';
+                } else{
+                    estatus = '1';
+                }
+                
                 var currentDate = new Date();
                 var fecha_actualizacion = currentDate.getFullYear() + "-" + (('0' + (currentDate.getMonth() + 1)).slice(-2)) + "-" + ('0' + currentDate.getDate()).slice(-2) + " " + ("0" + currentDate.getHours()).slice(-2) + ":" + ("0" + currentDate.getMinutes()).substr(-2) + ":" + currentDate.getSeconds();        
                 
@@ -687,12 +787,16 @@
                     dataType: 'json',
                     data: {
                         id_capa: id_capa,
-                        statusCapa: 0,
+                        statusCapa: estatus,
                         fecha_actualizacion: fecha_actualizacion
                     },
                     success: function (data) {
-                        
-                        document.getElementById("msgExito").innerHTML = "Se ha deshabilitado la capa"+"&nbsp"+$("#capa-seleccionada").val(); 
+                        var nombre = data.nombre;
+                        if(estatus === '1'){
+                            document.getElementById("msgExito").innerHTML = "Se ha habilitado la capa"+"&nbsp"+nombre;
+                        } else{
+                            document.getElementById("msgExito").innerHTML = "Se ha deshabilitado la capa"+"&nbsp"+nombre;
+                        }
                         $('#modalExito').modal('show');
                         $('#modalExito').on('hidden.bs.modal', function () {
                             location.reload();
@@ -761,37 +865,64 @@
                 
                 var id_capa = $("#id_capa").val();
                 var nombre = $("#nombre").val();
+                console.log(nombre);
                 var kmz = $("#kmz").val();
                 var rutaFoto = $("#rutaFoto").val();
+                var file = $('#file').get(0).files[0];
                 var currentDate = new Date();
                 var fecha_actualizacion = currentDate.getFullYear() + "-" + (('0' + (currentDate.getMonth() + 1)).slice(-2)) + "-" + ('0' + currentDate.getDate()).slice(-2) + " " + ("0" + currentDate.getHours()).slice(-2) + ":" + ("0" + currentDate.getMinutes()).substr(-2) + ":" + currentDate.getSeconds();
-
-                var formData = new FormData();
-                formData.append('id_capa', id_capa);
-                formData.append('nombre', nombre);
-                formData.append('kmz', kmz);
-                formData.append('rutaFoto', rutaFoto);
-                formData.append('fecha_actualizacion', fecha_actualizacion);
-                formData.append('file', $("input[type=file]")[0].files[0]);
                 
-                $.ajax({
-                url: 'editar_capa.htm',
-                type: "POST",
-                enctype: 'multipart/form-data',
-                processData: false, // Important!
-                contentType: false,
-                cache: false,
-                dataType: "json",
-                data: formData,
-                success: function (data) {
-                    /*document.getElementById("msgExito").innerHTML = "Se ha actualizado la capa"+"&nbsp"+$("#capa-seleccionada").val(); 
-                    $('#modalExito').modal('show');
-                    $('#modalExito').on('hidden.bs.modal', function () {
-                        location.reload();
-                    });*/
-                }, error: function (error) {
-                    console.log(error);
-                }});
+                if(file === undefined){
+                    var formData = new FormData();
+                    formData.append('id_capa', id_capa);
+                    formData.append('nombre', nombre);
+                    formData.append('kmz', kmz);
+                    formData.append('rutaFoto', rutaFoto);
+                    formData.append('fecha_actualizacion', fecha_actualizacion);
+                    
+                    $.ajax({
+                    url: 'editar_capa.htm',
+                    type: "POST",
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    data: formData,
+                    success: function (data) {
+                        document.getElementById("msgExito").innerHTML = "Se ha actualizado la capa"+"&nbsp"+$("#capa-seleccionada").val(); 
+                        $('#modalExito').modal('show');
+                        $('#modalExito').on('hidden.bs.modal', function () {
+                            location.reload();
+                        });
+                    }, error: function (error) {
+                        console.log(error); 
+                    }});
+                }else{
+                   
+                    var formData = new FormData();
+                    formData.append('id_capa', id_capa);
+                    formData.append('nombre', nombre);
+                    formData.append('kmz', kmz);
+                    formData.append('rutaFoto', rutaFoto);
+                    formData.append('fecha_actualizacion', fecha_actualizacion);
+                    formData.append('file', $('#file').get(0).files[0]);
+                    
+                    $.ajax({
+                    url: 'editar_capa_file.htm',
+                    type: "POST",
+                    contentType: false,
+                    processData: false,
+                    cache: false,
+                    data: formData,
+                    success: function (data) {
+                        document.getElementById("msgExito").innerHTML = "Se ha actualizado la capa"+"&nbsp"+$("#capa-seleccionada").val(); 
+                        $('#modalExito').modal('show');
+                        $('#modalExito').on('hidden.bs.modal', function () {
+                            location.reload();
+                        });
+                    }, error: function (error) {
+                        console.log(error.responseText);
+                    }});
+                }
             });
         </script>
     </body>

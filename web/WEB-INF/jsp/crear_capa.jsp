@@ -1,13 +1,8 @@
-<%@page import="java.util.Iterator"%>
-<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@page import="Model.lectura_vehiculo"%>
-<%@page import="java.util.List"%>
-<%@page import="ModelDAO.lectura_vehiculoDAO"%>
 <%@page import="Config.Conexion"%>
 <%@page import="java.sql.ResultSet"%>
 <%@page import="java.sql.SQLException"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -118,19 +113,22 @@
                             <div class="form-group row ">
                                 <label for="nombre" class="col-sm-4 col-form-label">Nombre:</label>
                                 <div class="col-sm-8">
-                                    <input type="text" class="form-control" name="nombre" id="nombre" autocomplete="off" onkeyup="validarCapa(this);">
+                                    <input type="text" required class="form-control" name="nombre" id="nombre" autocomplete="off" onkeyup="validarCapa(this);">
                                     <p id="errorCapa" style="color: #F8E71C; font-size: 12px; height: 0px;"></p>
                                 </div>
                             </div>
                             <div class="form-group row ">
                                 <label for="numero" class="col-sm-4 col-form-label">Adjuntar icono:</label>
-                                <div class="col-sm-4">
+                                <div class="col-sm-6">
                                     <div class="upload-img" id="previewImg"></div>
-                                    <input type="file" id="file" name="file">
+                                    <input type="file" id="file" name="file" required>
                                     <label class="btn-file" for="file">Cargar</label>
+                                    <p id="errorIcon" style="color: #F8E71C; font-size: 12px; height: 0px;"></p>
                                 </div>
+                                
                             </div>
                             <input hidden type="text" id="kmz" name="kmz">
+                            <p id="errorKMZ" style="color: #F8E71C; font-size: 12px; height: 0px;"></p>
                         </div>
                         <div class="card-footer center">
                             <button type="button" class="btn btn-outline-primary">Cancelar</button>
@@ -281,11 +279,11 @@
                             <div class="col center"><i style="color: #28a745;" class="fas fa-check-circle fa-2x"></i></div>
                         </div>
                         <div class="row">
-                            <div class="col center"><h4 class="text-white">Exito</h4></div>
+                            <div class="col center"><h5 class="text-white">Exito</h5></div>
                         </div>
                         <div class="separator center"></div>
                         <div class="row">
-                            <div class="col center"><p style="color: #f8e71c; font-weight: bold; font-size: 12px;">Se ha creado la capa correctamente.</p></div>
+                            <div class="col center"><p style="color: #f8e71c; font-weight: bold; font-size: 14px;">Se ha creado la capa correctamente.</p></div>
                         </div>
                         <div class="row">
                             <div class="col center"><button class="btn btn-primary" data-dismiss="modal">Aceptar</button></div> 
@@ -566,19 +564,30 @@
             function validate() {
 
                 if (document.myForm.nombre.value === "") {
-                    alert("Por favor ingresa el nombre!");
+                    document.getElementById("errorCapa").innerHTML = "Por favor, ingrese el nombre.";
+                    $("#errorCapa").show();
                     document.myForm.nombre.focus();
                     return false;
                 }
+                
                 if (document.myForm.file.value === "") {
-                    alert("Por favor carge el icono!");
+                    document.getElementById("errorIcon").innerHTML = "Por favor, cargue un icono.";
+                    $("#errorIcon").show();
                     document.myForm.file.focus();
                     return false;
+                }else{
+                    document.getElementById("errorIcon").innerHTML = "";
+                    $("#errorIcon").hide();
                 }
+                
                 if (document.myForm.kmz.value === "") {
-                    alert("Por favor trace la ruta!");
+                    document.getElementById("errorKMZ").innerHTML = "Por favor, trace una ruta.";
+                    $("#errorKMZ").show();
                     document.myForm.kmz.focus();
                     return false;
+                }else{
+                    document.getElementById("errorKMZ").innerHTML = "";
+                    $("#errorKMZ").hide();
                 }
 
                 return(true);

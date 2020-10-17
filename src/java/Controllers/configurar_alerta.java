@@ -20,12 +20,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * @author Carlos Larios
  */
 public class configurar_alerta {
-    private Conexion connec;
-    Conexion cn = new Conexion();
-    Connection con;
+    
     PreparedStatement ps;
     ResultSet rs;
-    Model.lectura_vehiculo lv = new Model.lectura_vehiculo();
     
     
     @RequestMapping("configurar_alerta.htm")

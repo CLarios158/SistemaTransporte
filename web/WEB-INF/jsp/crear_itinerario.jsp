@@ -1,13 +1,8 @@
-<%@page import="java.util.Iterator"%>
-<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@page import="Model.lectura_vehiculo"%>
-<%@page import="java.util.List"%>
-<%@page import="ModelDAO.lectura_vehiculoDAO"%>
 <%@page import="Config.Conexion"%>
 <%@page import="java.sql.ResultSet"%>
 <%@page import="java.sql.SQLException"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -110,72 +105,67 @@
                     <a class="color-label" href="<c:url value="index.htm" />"><i class="fas fa-home color-icon"></i>Itinerario |</a>
                     <a class="color-label-bold" href="<c:url value="crear_capa.htm" />" >Crear Itinerario</a>
                 </nav>
-                <div class="card main-slide-menu-card"> 
-                    <div class="card-body">
-                        <div class="form-group row ">
-                            <label for="nombre" class="col-sm-4 col-form-label">Nombre:</label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control" name="nombre" id="nombre" autocomplete="off" onkeyup="validarItinerario(this);">
-                                <p id="errorItinerario" style="color: #F8E71C; font-size: 12px; height: 0px; display: none;"></p>
+                <div class="card main-slide-menu-card">
+                    <form name="myForm" onsubmit="return(validate());" method="POST" enctype="multipart/form-data">
+                        <div class="card-body">
+                            <div class="form-group row ">
+                                <label for="nombre" class="col-sm-4 col-form-label">Nombre:</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" name="nombre" id="nombre" autocomplete="off" onkeyup="validarItinerario(this);">
+                                    <p id="errorItinerario" style="color: #F8E71C; font-size: 12px; height: 0px; display: none;"></p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="form-group row">
-                            <label for="ruta" class="col-sm-4 col-form-label">Ruta asignada:</label>
-                            <div class="col-sm-8">
-                                <select class="form-control" id="selectRuta" name="selectRuta" autocomplete="off">
-                                    <option value="empty"></option>
-                                    <%
-                                        try {
-                                            ResultSet r = Conexion.query("SELECT id_ruta, nombre FROM cat_ruta;");
-                                            while (r.next()) {%>
-                                                <option value=<%= r.getString(1)%>><%= r.getString(2)%></option>
-                                    <%}
-                                            r.close();
-                                        } catch (Exception e) {
-                                        }
-                                    %>
-                                </select>
-                            </div>                            
-                        </div>
-                        <div class="form-group row">
-                            <label for="unidad" class="col-sm-4 col-form-label">Buscar unidad:</label>
-                            <div class="col-sm-8 input-icons">
-                                <i class="fas fa-search icon-input"></i>
-                                <input type="text" class="form-control" name="buscarUnidad" id="buscarUnidad" autocomplete="off">
-                                <div style="z-index: 2; position: absolute; width: 90%;" class="list-group" id="show-list"></div>
+                            <div class="form-group row">
+                                <label for="ruta" class="col-sm-4 col-form-label">Ruta asignada:</label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" id="selectRuta" name="selectRuta" autocomplete="off">
+                                        <option value="0"></option>
+                                        <c:forEach var="ruta_p" items="${rutas_option}">
+                                            <option value=${ruta_p.getId_ruta()}>${ruta_p.getNombre()}</option>
+                                        </c:forEach>
+                                    </select>
+                                    <p id="errorRuta" style="color: #F8E71C; font-size: 12px; height: 0px; display: none;"></p>
+                                </div>                            
                             </div>
-                        </div>
-                        <div class="form-group row">
-                            <label for="unidad" class="col-sm-4 col-form-label">Unidades Asignadas:</label>
-                            <div class="col-sm-8">
-                                <!--<table id="tabla" class="table-unidades">
-                                </table>-->
-                                <div  id="unidades"></div>
+                            <div class="form-group row">
+                                <label for="unidad" class="col-sm-4 col-form-label">Buscar unidad:</label>
+                                <div class="col-sm-8 input-icons">
+                                    <i class="fas fa-search icon-input"></i>
+                                    <input type="text" class="form-control" name="buscarUnidad" id="buscarUnidad" autocomplete="off">
+                                    <div style="z-index: 2; position: absolute; width: 90%;" class="list-group" id="show-list"></div>
+                                    <p id="errorUnidad" style="color: #F8E71C; font-size: 12px; height: 0px; display: none;"></p>
+                                </div>
                             </div>
-                        </div>
-                        <!--<div class="form-group row ">
-                            <label style="cursor: pointer;" class="col-sm-4" id="btn-AddLugar"><i class="fas fa-plus fa-sm"></i> Añadir lugar</label>
-                        </div>-->
-                        <div class="form-group row ">
-                            <div style="border-radius: 5px; border: 1px solid #122F3E; width: 94%; margin-left: 3%; margin-right: 3%;">
-                                <table class="table-itinerario" id="tableItinerario" >
-                                    <tbody>
-                                        <tr>
-                                            <th>Lugar</th>
-                                            <th>Hora</th>
-                                            <th></th>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <div class="form-group row">
+                                <label for="unidad" class="col-sm-4 col-form-label">Unidades Asignadas:</label>
+                                <div class="col-sm-8">
+                                    <!--<table id="tabla" class="table-unidades">
+                                    </table>-->
+                                    <div  id="unidades"></div>
+                                </div>
                             </div>
+                            <div class="form-group row ">
+                                <div style="border-radius: 5px; border: 1px solid #122F3E; width: 94%; margin-left: 3%; margin-right: 3%;">
+                                    <table class="table-itinerario" id="tableItinerario" >
+                                        <tbody>
+                                            <tr>
+                                                <th>Lugar</th>
+                                                <th>Hora</th>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <p id="errorTabla" style="color: #F8E71C; font-size: 12px; height: 0px; display: none;"></p>
+                                </div>
+                            </div>
+                            <p id="errorKMZ" style="color: #F8E71C; font-size: 12px; height: 0px; display: none;"></p>
+                            <input hidden type="text" id="kmz" name="kmz">
+                            <input hidden type="text" id="unidad" name="unidad" />
                         </div>
-                        <input hidden type="text" id="kmz" name="kmz">
-                        <input hidden type="text" id="unidad" name="unidad" />
-                    </div>
-                    <div class="card-footer center">
-                        <button class="btn btn-outline-primary">Cancelar</button>
-                        <button id="btn-guardar" class="btn btn-primary btn-small">Guardar</button>
-                    </div>
+                        <div class="card-footer center">
+                            <button id="btn-cancelar" type="button" class="btn btn-outline-primary">Cancelar</button>
+                            <button id="btn-guardar" type="button" class="btn btn-primary btn-small">Guardar</button>
+                        </div>
+                    </form>
                 </div>
             </div>
 
@@ -313,11 +303,11 @@
                             <div class="col center"><i style="color: #28a745;" class="fas fa-check-circle fa-2x"></i></div>
                         </div>
                         <div class="row">
-                            <div class="col center"><h4 class="text-white">Exito</h4></div>
+                            <div class="col center"><h5 class="text-white">Exito</h5></div>
                         </div>
                         <div class="separator center"></div>
                         <div class="row">
-                            <div class="col center"><p style="color: #f8e71c; font-weight: bold; font-size: 12px;" id="msgExito"></p></div>
+                            <div class="col center"><p style="color: #f8e71c; font-weight: bold; font-size: 14px;" id="msgExito"></p></div>
                         </div>
                         <div class="row">
                             <div class="col center"><button class="btn btn-primary" data-dismiss="modal">Aceptar</button></div> 
@@ -504,8 +494,8 @@
                     
                     $("#tableItinerario").append(
                         $("<tr>")
-                        .append($("<td>").append($('<input style=" width: 150px; height: 25px;" class="form-control" id="lugares" name="lugares[]" />')))
-                        .append($("<td>").append($('<input style=" width: 100px; height: 25px;" class="form-control" id="horas" name="horas[]" />')))
+                        .append($("<td>").append($('<input style=" width: 150px; height: 25px;" class="form-control" id="lugares" name="lugares[]" autocomplete="off" required/>')))
+                        .append($("<td>").append($('<input style=" width: 100px; height: 25px;" class="form-control" id="horas" name="horas[]" autocomplete="off"/> required')))
                         //.append($("<td>").append($('<button  class="btn btn-eliminar"><i class="fas fa-trash" style="color: #D0021B"></i></button>')))
                     );
                 }
@@ -577,18 +567,85 @@
                 });
             });
         </script>
+        
+        <!-- Validar Formulario -->
+        <script type = "text/javascript">
+            
+            $('#btn-cancelar').click(function () {
+                location.reload();
+            });
+            
+            function validate() {
+
+                if (document.myForm.nombre.value === "") {
+                    document.getElementById("errorItinerario").innerHTML = "Por favor, ingrese el nombre.";
+                    $("#errorItinerario").show();
+                    document.myForm.nombre.focus();
+                    return false;
+                }else{
+                    document.getElementById("errorItinerario").innerHTML = "";
+                    $("#errorItinerario").hide();
+                }
+                
+                if (document.myForm.selectRuta.value === "" || document.myForm.selectRuta.value === "0") {
+                    document.getElementById("errorRuta").innerHTML = "Por favor, seleccione una ruta.";
+                    $("#errorRuta").show();
+                    document.myForm.selectRuta.focus();
+                    return false;
+                }else{
+                    document.getElementById("errorRuta").innerHTML = "";
+                    $("#errorRuta").hide();
+                }
+                
+                if (document.myForm.unidad.value === "") {
+                    document.getElementById("errorUnidad").innerHTML = "Por favor, asigne la unidad al ramal.";
+                    $("#errorUnidad").show();
+                    document.myForm.unidad.focus();
+                    return false;
+                }else{
+                    document.getElementById("errorUnidad").innerHTML = "";
+                    $("#errorUnidad").hide();
+                }
+                
+                if (document.myForm.kmz.value === "") {
+                    document.getElementById("errorKMZ").innerHTML = "Por favor, trace una ruta.";
+                    $("#errorKMZ").show();
+                    document.myForm.kmz.focus();
+                    return false;
+                }else{
+                    document.getElementById("errorKMZ").innerHTML = "";
+                    $("#errorKMZ").hide();
+                }
+                
+                /*if ((document.getElementById("lugares").value).length === 0 && (document.getElementById("horas").value).length === 0) {
+                    
+                    document.getElementById("errorTabla").innerHTML = "Por favor, ingrese el lugar y la hora.";
+                    $("#errorTabla").show();
+                    
+                    return false;
+                }else{
+                    document.getElementById("errorTabla").innerHTML = "";
+                    $("#errorTabla").hide();
+                }*/
+              
+                return(true);
+            }
+        </script>
 
         <!--Buscar Unidad -->
         <script type="text/javascript">
             $(document).ready(function () {
                 $("#buscarUnidad").keyup(function (e) {
                     e.preventDefault();
+                    
                     var unidad = $(this).val();
+                    var id_ruta = $("#selectRuta").val();
+                    
                     if (unidad !== '') {
                         $.ajax({
-                            url: 'buscar_unidad.htm',
+                            url: 'buscar_unidad_itinerario.htm',
                             type: "GET",
-                            data: {unidad: unidad},
+                            data: { unidad: unidad, id_ruta: id_ruta },
                             success: function (data) {
                                 if (data.length > 0) {
                                     var lista = "";
@@ -625,53 +682,59 @@
         <script>
             $("#btn-guardar").click(function (e) {
                 e.preventDefault();
+                if(validate()){
+                    var lugares = document.getElementsByName('lugares[]');
+                    var horas = document.getElementsByName('horas[]');
+                    var kmz = $("#kmz").val();
+                    var nombre = $("#nombre").val();
+                    var id_ruta = $("#selectRuta").val();
+                    var id_unidad = $("#unidad").val();
+                    var statusItinerario = 1;
+                    var currentDate = new Date();
+                    var fecha_registro = currentDate.getFullYear() + "-" + (('0' + (currentDate.getMonth() + 1)).slice(-2)) + "-" + ('0' + currentDate.getDate()).slice(-2) + " " + ("0" + currentDate.getHours()).slice(-2) + ":" + ("0" + currentDate.getMinutes()).substr(-2) + ":" + currentDate.getSeconds();
+                    var json = JSON.parse(kmz);
+                    var contador = 0;
                 
-                var lugares = document.getElementsByName('lugares[]');
-                var horas = document.getElementsByName('horas[]');
-                var kmz = $("#kmz").val();
-                var nombre = $("#nombre").val();
-                var id_ruta = $("#selectRuta").val();
-                var id_unidad = $("#unidad").val();
-                var statusItinerario = 1;
-                var currentDate = new Date();
-                var fecha_registro = currentDate.getFullYear() + "-" + (('0' + (currentDate.getMonth() + 1)).slice(-2)) + "-" + ('0' + currentDate.getDate()).slice(-2) + " " + ("0" + currentDate.getHours()).slice(-2) + ":" + ("0" + currentDate.getMinutes()).substr(-2) + ":" + currentDate.getSeconds();
-                var json = JSON.parse(kmz);
-               
-                // Asignación de lugar y hora al json
-                for (i = 0; i < json.length; i++) { 
-                    for (var i = 0; i < lugares.length; i++) { 
-                        var a = lugares[i]; 
-                        json[i].lugar = a.value;
+                    // Asignación de lugar y hora al json
+                    for (i = 0; i < json.length; i++) { 
+                        
+                        for (var i = 0; i < lugares.length; i++) { 
+                            var a = lugares[i]; 
+                            json[i].lugar = a.value;
+                            contador = contador + 1;
+                            json[i].id  = contador;
+                        }
+                        
+                        for (var i = 0; i < horas.length; i++) { 
+                            var a = horas[i]; 
+                            json[i].hora = a.value;
+                        }
                     }
-                    for (var i = 0; i < horas.length; i++) { 
-                        var a = horas[i]; 
-                        json[i].hora = a.value;
-                    }
+                
+                    $.ajax({
+                        url: 'registrar_itinerario.htm',
+                        type: "POST",
+                        dataType: "json",
+                        data: {
+                            nombre: nombre,
+                            id_ruta: id_ruta,
+                            id_unidad: id_unidad,
+                            statusItinerario: statusItinerario,
+                            kmz: JSON.stringify(json),
+                            fecha_registro: fecha_registro
+                        },
+                        success: function (data) {
+                            document.getElementById("msgExito").innerHTML = "Se ha creado el itinerario"+"&nbsp"+nombre; 
+                            $('#modalExito').modal('show');
+                            $('#modalExito').on('hidden.bs.modal', function () {
+                                location.reload();
+                            });
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+                    });
                 }
-                $.ajax({
-                    url: 'registrar_itinerario.htm',
-                    type: "POST",
-                    dataType: "json",
-                    data: {
-                        nombre: nombre,
-                        id_ruta: id_ruta,
-                        id_unidad: id_unidad,
-                        statusItinerario: statusItinerario,
-                        kmz: JSON.stringify(json),
-                        fecha_registro: fecha_registro
-                    },
-                    success: function (data) {
-                        var nombre = data.nombre;
-                        document.getElementById("msgExito").innerHTML = "Se ha creado el itinerario"+"&nbsp"+nombre; 
-                        $('#modalExito').modal('show');
-                        $('#modalExito').on('hidden.bs.modal', function () {
-                            location.reload();
-                        });
-                    },
-                    error: function (error) {
-                        console.log(error);
-                    }
-                });
                 
             });
 

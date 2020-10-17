@@ -6835,7 +6835,7 @@ input[type="file"] {
 .modal-content {
     background-color: #05151C;
     border-radius: 0px;
-    width: 110%;
+    width: 120%;
     margin: 15% auto; /* 15% from the top and centered */
     padding: 20px;
     border: 1px solid #193341;
@@ -7220,5 +7220,9 @@ input[type="checkbox"].check-icon:checked:after {
     font-size: 12px;
     padding: 8px;
     border-bottom: 1px solid #122F3E; 
+}
+
+.dropdown-menu {
+    font-size: 12px;
 }
 

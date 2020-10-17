@@ -8,10 +8,11 @@ package Controllers;
 import Config.Conexion;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
+import java.sql.Statement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.servlet.ServletException;
@@ -31,26 +32,50 @@ import org.springframework.web.bind.annotation.RequestMethod;
  */
 public class asociar_gps {
 
-    private Conexion connec;
-    Conexion cn = new Conexion();
-    Connection con;
     PreparedStatement ps;
     ResultSet rs;
-    Model.lectura_vehiculo lv = new Model.lectura_vehiculo(); 
+    Statement s;
 
     @RequestMapping("asociar_gps.htm")
-    protected org.springframework.web.servlet.ModelAndView index(HttpServletResponse response, HttpServletRequest request) throws IOException {
+    protected org.springframework.web.servlet.ModelAndView index(HttpServletResponse response, HttpServletRequest request) throws IOException, SQLException {
+        
+        Conexion Conexion = new Conexion();
+        
         HttpSession session = request.getSession(false);
         org.springframework.web.servlet.ModelAndView mav = new org.springframework.web.servlet.ModelAndView();
 
         mav.setViewName("asociar_gps");
-
+        
+        ArrayList<Model.model_GPS> modelos_option;
+        modelos_option = new ArrayList<>();
+        
+        try {
+            
+            rs = Conexion.query("SELECT \"id_modelo_GPS\", nombre FROM \"cat_modelo_GPS\";");
+            
+            while(rs.next()){ 
+                modelos_option.add(new Model.model_GPS(
+                    rs.getInt("id_modelo_GPS"),
+                    rs.getString("nombre")
+                ));
+            }
+            mav.addObject("modelos_option", modelos_option); 
+            
+        } catch (SQLException e) {
+            System.err.print(e);
+        } finally {
+            if (Conexion != null) { Conexion.executeQueryClose(); System.out.println("close conexion"); }
+            if (rs != null) { rs.close(); System.out.println("close rs"); }  
+        }
+ 
         return mav;
     }
 
     @RequestMapping(value = "buscar_niv.htm", method = RequestMethod.GET)
-    public void buscar_niv(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+    public void buscar_niv(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
+        
+        Conexion Conexion = new Conexion();
+        
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
@@ -59,27 +84,34 @@ public class asociar_gps {
         JSONArray unidades = new JSONArray(); 
 
         try {
-            rs = Conexion.query("SELECT id_unidad, no_unidad, \"NIV\" FROM cat_unidad WHERE \"NIV\"::text LIKE '%" + niv + "%'");
-
+            //rs = Conexion.query("SELECT id_unidad, no_unidad, \"NIV\" FROM cat_unidad WHERE \"NIV\"::text LIKE '%" + niv + "%'");
+            rs = Conexion.query("SELECT id_unidad, no_unidad, \"NIV\" \n" +
+                "FROM cat_unidad \n" +
+                "WHERE \"NIV\"::text LIKE '%" + niv + "%' AND \"NIV\"  not in (select niv from \"GPS_unidad\");");
+            
             while (rs.next()) {
                 Map m = new LinkedHashMap(2);
                 m.put("id_unidad", rs.getString(1));
-                m.put("no_unidad", rs.getString(2));
-                m.put("niv", rs.getString(3)); 
+                m.put("no_unidad", rs.getString(2)); 
+                m.put("niv", rs.getString(3));  
                 unidades.add(m);
             }
 
-        } catch (SQLException e) {
+        } catch (SQLException e) { 
             System.err.print(e);
+        } finally {
+            if (Conexion != null) { Conexion.executeQueryClose(); System.out.println("close conexion"); }
+            if (rs != null) { rs.close(); System.out.println("close rs"); }  
         }
 
         out.println(unidades);
-        out.close();
     }
 
     @RequestMapping(value = "registrar_asociacion.htm", method = RequestMethod.POST)
-    public void registrar_asociacion(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ParseException, JSONException {
-
+    public void registrar_asociacion(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ParseException, JSONException, SQLException {
+        
+        Conexion Conexion = new Conexion();
+        
         response.setContentType("application/json;charset=utf-8");
         PrintWriter out = response.getWriter();
 
@@ -94,48 +126,65 @@ public class asociar_gps {
         JSONObject datos = new JSONObject();
         
         try {
-            rs = Conexion.query("SELECT niv FROM \"GPS_unidad\" WHERE id_modelo_gps = "+id_modelo_gps+" and \"no_serie_GPS\" = '"+no_serie+"';");
+            
+            rs = Conexion.query("SELECT niv FROM \"GPS_unidad\" WHERE niv = '"+niv+"';");
 
             while (rs.next()) {
                 var = rs.getString(1);
             }
+            
+            /*rs = Conexion.query("SELECT niv FROM \"GPS_unidad\" WHERE id_modelo_gps = "+id_modelo_gps+" and \"no_serie_GPS\" = '"+no_serie+"';");
+
+            while (rs.next()) {
+                var = rs.getString(1);
+            }*/
 
         } catch (SQLException e) {
             System.err.print(e);
+        } finally {
+            if (Conexion != null) { Conexion.executeQueryClose(); System.out.println("close conexion"); }
+            if (rs != null) { rs.close(); System.out.println("close rs"); }  
         }
         
         if("".equals(var)){
             try {
-                rs = Conexion.query("INSERT INTO \"GPS_unidad\"(niv,id_modelo_gps,\"no_serie_GPS\",fecha_registro) VALUES('" + niv + "'," + id_modelo_gps + ",'" + no_serie + "','" + fecha_registro + "') RETURNING id_gps,niv,id_modelo_gps,\"no_serie_GPS\",fecha_registro;");
-
-                while (rs.next()) {
+                s = Conexion.update("INSERT INTO \"GPS_unidad\"(niv,id_modelo_gps,\"no_serie_GPS\",fecha_registro) VALUES('" + niv + "'," + id_modelo_gps + ",'" + no_serie + "','" + fecha_registro + "');");
+                rs = s.getGeneratedKeys();
+                /*while (rs.next()) {
                     datos.put("id_gps", rs.getString(1));
                     datos.put("niv", rs.getString(2));
                     datos.put("id_modelo_gps", rs.getString(3));
                     datos.put("no_serie_gps", rs.getString(4));
                     datos.put("fecha_registro", rs.getString(5));
                 }
-                rs.close();
+                rs.close();*/
 
 
-            } catch (SQLException | JSONException e) {
+            } catch (SQLException e) {
                 System.err.print(e);
+            } finally {
+                if (Conexion != null) { Conexion.executeQueryCloseUpdate(); System.out.println("close conexion"); }
+                if (rs != null) { rs.close(); System.out.println("close rs"); }
             }
 
             try {
-                rs = Conexion.query("UPDATE cat_unidad SET kilometraje = " + kilometraje + " WHERE id_unidad = " + id_unidad + " RETURNING kilometraje;");
-                while (rs.next()) {
+                
+                s = Conexion.update("UPDATE cat_unidad SET kilometraje = " + kilometraje + " WHERE id_unidad = " + id_unidad + ";");
+                rs = s.getGeneratedKeys();
+                /*while (rs.next()) {
                     datos.put("kilometraje", rs.getString(1));
-                }
-                rs.close();
-            } catch (SQLException | JSONException e) {
+                }*/
+                
+            } catch (SQLException e) {
                 System.err.print(e);
+            } finally {
+                if (Conexion != null) { Conexion.executeQueryCloseUpdate(); System.out.println("close conexion"); }
+                if (rs != null) { rs.close(); System.out.println("close rs"); }
             }
         }else{
             datos.put("estado", 1);
         }
         
-        System.out.println(datos);
         out.print(datos);
     }
 }

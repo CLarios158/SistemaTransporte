@@ -1,13 +1,8 @@
-<%@page import="java.util.Iterator"%>
-<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@page import="Model.lectura_vehiculo"%>
-<%@page import="java.util.List"%>
-<%@page import="ModelDAO.lectura_vehiculoDAO"%>
 <%@page import="Config.Conexion"%>
 <%@page import="java.sql.ResultSet"%>
 <%@page import="java.sql.SQLException"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -120,6 +115,7 @@
                         </div>
                         <div id="editar-ramal" style="display: none;">
                             <input id="id_ramal" name="id_ramal" hidden />
+                            <input id="estatus" name="estatus" hidden />
                             <input id="ramal-seleccionada" name="ramal-seleccionada" hidden />
                             <div class="form-group row ">
                                 <label for="nombre" class="col-sm-4 col-form-label">Nombre:</label>
@@ -138,16 +134,9 @@
                                 <div class="col-sm-8">
                                     <select class="form-control" id="selectRuta" name="selectRuta">
                                         <option value="empty"></option>
-                                        <%
-                                            try {
-                                                ResultSet r = Conexion.query("SELECT id_ruta, nombre FROM cat_ruta;");
-                                                while (r.next()) {%>
-                                                    <option value=<%= r.getString(1)%>><%= r.getString(2)%></option>
-                                        <%}
-                                                r.close();
-                                            } catch (Exception e) {
-                                            }
-                                        %>
+                                        <c:forEach var="ruta_p" items="${rutas_option}">
+                                            <option value=${ruta_p.getId_ruta()}>${ruta_p.getNombre()}</option>
+                                        </c:forEach>
                                     </select>
                                 </div>                            
                             </div>
@@ -167,6 +156,8 @@
                             </div>
                             <input hidden type="text" id="kmz" name="kmz">
                             <input hidden type="text" id="unidadesA" name="unidadesA" />
+                            <input hidden type="text" id="unidadesN" name="unidadesN" />
+                            <input hidden type="text" id="unidadesE" name="unidadesE" />
                         </div>
                     </div>
                     <div class="card-footer"> 
@@ -178,7 +169,7 @@
                             </div> 
                             <div  class="row"> 
                                 <div class="col center"><label for="editar">Editar</label></div>
-                                <div class="col center"><label for="deshabilitar">Deshabilitar</label></div>
+                                <div class="col center"><label id="nombre-status"  for="deshabilitar"></label></div>
                                 <div class="col center"><label for="elimnar">Eliminar</label></div>
                             </div>
                         </div>
@@ -324,11 +315,11 @@
                             <div class="col center"><i style="color: #c82333;" class="fas fa-exclamation-circle fa-2x"></i></div>
                         </div>
                         <div class="row">
-                            <div class="col center"><h6 class="text-white">Deshabilitar Ramal</h6></div>
+                            <div class="col center"><h5 class="text-white" id="title"></h5></div>
                         </div>
                         <div class="separator center"></div>
                         <div class="row">
-                            <div class="col center"><p style="color: #f8e71c; font-weight: bold; font-size: 12px;">¿Desea deshabilitar el ramal </p><p style="color: #f8e71c; font-weight: bold; font-size: 12px;" id="ramalSeleccionada"></p></div>
+                            <div class="col center"><p style="color: #f8e71c; font-weight: bold; font-size: 14px;" id="ramalSeleccionada"></p></div>
                         </div>
                         <div class="row">
                             <div class="col text-right"><button class="btn btn-primary" data-dismiss="modal"><i class="fas fa-times"></i>Cancelar</button></div>
@@ -348,14 +339,14 @@
                             <div class="col center"><i style="color: #c82333;" class="fas fa-exclamation-triangle fa-2x"></i></div>
                         </div>
                         <div class="row">
-                            <div class="col center"><h6 class="text-white">Eliminar</h6></div>
+                            <div class="col center"><h5 class="text-white">Eliminar</h5></div>
                         </div>
                         <div class="separator center"></div>
                         <div class="row">
-                            <div class="col center"><p style="font-size: 12px;">Si elimina este ramal se eliminará la información que esta contiene junto con sus elementos asociados</p></div>
+                            <div class="col center"><p style="font-size: 14px;">Si elimina este ramal se eliminará la información que esta contiene junto con sus elementos asociados</p></div>
                         </div>
                         <div class="row">
-                            <div class="col center"><p style="color: #f8e71c; font-weight: bold; font-size: 12px;">¿Desea eliminar el ramal</p><p style="color: #f8e71c; font-weight: bold; font-size: 12px;" id="ramalSeleccionada2"></p></div>
+                            <div class="col center"><p style="color: #f8e71c; font-weight: bold; font-size: 14px;">¿Desea eliminar el ramal</p><p style="color: #f8e71c; font-weight: bold; font-size: 14px;" id="ramalSeleccionada2"></p></div>
                         </div>
                         <div class="row">
                             <div class="col text-right"><button class="btn btn-primary" data-dismiss="modal"><i class="fas fa-times"></i>Cancelar</button></div>
@@ -375,11 +366,11 @@
                             <div class="col center"><i style="color: #28a745;" class="fas fa-check-circle fa-2x"></i></div>
                         </div>
                         <div class="row">
-                            <div class="col center"><h4 class="text-white">Exito</h4></div>
+                            <div class="col center"><h5 class="text-white">Exito</h5></div>
                         </div>
                         <div class="separator center"></div>
                         <div class="row">
-                            <div class="col center"><p style="color: #f8e71c; font-weight: bold; font-size: 12px;" id="msgExito"></p></div>
+                            <div class="col center"><p style="color: #f8e71c; font-weight: bold; font-size: 14px;" id="msgExito"></p></div>
                         </div>
                         <div class="row">
                             <div class="col center"><button class="btn btn-primary" data-dismiss="modal">Aceptar</button></div> 
@@ -518,6 +509,26 @@
                 
                 return map;
             }
+            
+            /*map.addListener('click', addLatLng);
+                
+            //Añadir un punto al mapa
+            function addLatLng(event) {
+                var kmz = $("#kmz").val();
+                var json = JSON.parse(kmz);
+                var arrayKMZ = [];
+
+                for(var i in json){
+                    arrayKMZ.push(json[i]);
+                }
+
+                arrayKMZ.push({lng: event.latLng.lng(), lat: event.latLng.lat()});
+                $("#kmz").val(JSON.stringify(arrayKMZ));
+
+                var poly = Polyline(arrayKMZ);
+                poly.setMap(map);
+                var markers = Marker(arrayKMZ, map);
+            }*/
            
             //Crear la linea entro los puntos
             function Polyline(path){
@@ -636,6 +647,158 @@
             });
         </script>
         
+        <!-- Eliminar la ruta del mapa -->
+        <script>
+            $("#borrar-ruta").click(function () {
+                document.getElementById("kmz").value = "";
+                
+                var map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 13,
+                    center: coords,
+                    styles: [
+                        {elementType: 'geometry', stylers: [{color: '#03060c'}]},
+                        {elementType: 'labels.text.stroke', stylers: [{color: '#0A1E28'}]},
+                        {elementType: 'labels.text.fill', stylers: [{color: '#746855'}]},
+                        {
+                            featureType: 'administrative.locality',
+                            elementType: 'labels.text.fill',
+                            stylers: [{color: '#83888d'}]
+                        },
+                        {
+                            featureType: 'poi',
+                            elementType: 'labels.text.fill',
+                            stylers: [{color: '#83888d'}]
+                        },
+                        {
+                            featureType: 'poi.park',
+                            elementType: 'geometry',
+                            stylers: [{color: '#263c3f'}]
+                        },
+                        {
+                            featureType: 'poi.park',
+                            elementType: 'labels.text.fill',
+                            stylers: [{color: '#6b9a76'}]
+                        },
+                        {
+                            featureType: 'road',
+                            elementType: 'geometry',
+                            stylers: [{color: '#0e1c23'}]
+                        },
+                        {
+                            featureType: 'road',
+                            elementType: 'geometry.stroke',
+                            stylers: [{color: '#212a37'}]
+                        },
+                        {
+                            featureType: 'road',
+                            elementType: 'labels.text.fill',
+                            stylers: [{color: '#9ca5b3'}]
+                        },
+                        {
+                            featureType: 'road.highway',
+                            elementType: 'geometry',
+                            stylers: [{color: '#009186'}]
+                        },
+                        {
+                            featureType: 'road.highway',
+                            elementType: 'geometry.stroke',
+                            stylers: [{color: '#1f2835'}]
+                        },
+                        {
+                            featureType: 'road.highway',
+                            elementType: 'labels.text.fill',
+                            stylers: [{color: '#f3d19c'}]
+                        },
+                        {
+                            featureType: 'transit',
+                            elementType: 'geometry',
+                            stylers: [{color: '#830203'}]
+                        },
+                        {
+                            featureType: 'transit.station',
+                            elementType: 'labels.text.fill',
+                            stylers: [{color: '#d59563'}]
+                        },
+                        {
+                            featureType: 'water',
+                            elementType: 'geometry',
+                            stylers: [{color: '#17263c'}]
+                        },
+                        {
+                            featureType: 'water',
+                            elementType: 'labels.text.fill',
+                            stylers: [{color: '#515c6d'}]
+                        },
+                        {
+                            featureType: 'water',
+                            elementType: 'labels.text.stroke',
+                            stylers: [{color: '#17263c'}]
+                        }
+                    ]
+                });
+                
+                var poly;
+                var kmz = [];
+                
+                poly = new google.maps.Polyline({
+                    strokeColor: '#FF0000',
+                    strokeOpacity: 5,
+                    strokeWeight: 3
+                });
+
+                poly.setMap(map);
+                
+                 // Add a listener for the click event
+                map.addListener('click', addLatLng);
+                
+                // Handles click events on a map, and adds a new point to the Polyline.
+                function addLatLng(event) {
+                    var path = poly.getPath();
+                    // Because path is an MVCArray, we can simply append a new coordinate
+                    // and it will automatically appear.
+                    path.push(event.latLng);
+                    kmz.push({'lat': event.latLng.lat(), 'lng': event.latLng.lng()});
+                    //kmzJSON = JSON.stringify(kmz);
+                    document.getElementById("kmz").value = JSON.stringify(kmz);
+
+                    // Add a new marker at the new plotted point on the polyline.
+                    var marker = new google.maps.Marker({
+                        position: event.latLng,
+                        title: '#' + path.getLength(),
+                        map: map,
+                        draggable: true
+                    });
+
+                    google.maps.event.addListener(marker, "mousedown", function(event) {
+                        latActual = event.latLng.lat();
+                        lngActual = event.latLng.lng();
+                    });
+
+                    google.maps.event.addListener(marker, 'dragend', function (m) {
+                        var lat = m.latLng.lat();
+                        var lng = m.latLng.lng();
+
+                        kmz.find(item=>item.lat === latActual).lat = lat;
+                        kmz.find(item=>item.lng === lngActual).lng = lng;
+
+                        document.getElementById("kmz").value = JSON.stringify(kmz);
+
+                        poly.setMap(null);
+                        poly = new google.maps.Polyline({
+                            path: kmz,
+                            strokeColor: '#FF0000',
+                            strokeOpacity: 5,
+                            strokeWeight: 3
+                        });
+
+                        poly.setMap(map);
+
+
+                    });
+                }   
+            });
+        </script>
+        
         <!--Buscar Ramal -->
         <script type="text/javascript">
             $(document).ready(function () {
@@ -652,11 +815,11 @@
                             if(data.length > 0){
                                 var lista = "";
                                 for (i in data) {
-                                    lista += '<a id="click-ramal" href="#" data-value="'+data[i].nombre+'" data-id="'+data[i].id_ramal+'" class="list-group-item list-group-item-action border-1">'+data[i].nombre+'</a>';
+                                    lista += '<a id="click-ramal" href="#" data-status="'+data[i].estatus+'" data-value="'+data[i].nombre+'" data-id="'+data[i].id_ramal+'" class="list-group-item list-group-item-action border-1">'+data[i].nombre+'</a>';
                                 }
                                 $("#show-list").html(lista);
                             } else {
-                                $("#show-list").html('<a href="#" class="list-group-item list-group-item-action border-1">No se encontro la unidad</a>');
+                                $("#show-list").html('<a href="#" class="list-group-item list-group-item-action border-1">No se encontro el ramal</a>');
                             }
                               
                         }});
@@ -667,14 +830,22 @@
                 
                 $(document).on('click','a[id=click-ramal]', function(e){
                     
-                    $("#opciones-ramal").show();
-                    
                     $("#buscarRamal").val($(this).text());
                     var id_ramal = $(this).data("id");
                     var ramal_seleccionada = $(this).data('value');
+                    var status = $(this).data('status');
+                    
+                    if(status === 1){
+                        document.getElementById("nombre-status").innerHTML = "Deshabilitar";
+                    } else{
+                        document.getElementById("nombre-status").innerHTML = "Habilitar";
+                    }
+                    
+                    $("#estatus").val(status);
                     $("#id_ramal").val(id_ramal);
                     $("#ramal-seleccionada").val(ramal_seleccionada);
                     
+                    $("#opciones-ramal").show();
                     $("#show-list").html('');
                     
                 });
@@ -691,7 +862,14 @@
             });
             
             $('#modalDeshabilitar').click(function () {
-                document.getElementById("ramalSeleccionada").innerHTML = "&nbsp"+$("#ramal-seleccionada").val()+"?"; 
+                var estatus = $("#estatus").val();
+                if(estatus === '1'){
+                    document.getElementById("title").innerHTML = "Deshabilitar Ramal";
+                    document.getElementById("ramalSeleccionada").innerHTML = "¿Desea deshabilitar el"+"&nbsp"+$("#ramal-seleccionada").val()+"?"; 
+                } else{
+                    document.getElementById("title").innerHTML = "Habilitar Ramal";
+                    document.getElementById("ramalSeleccionada").innerHTML = "¿Desea habilitar el"+"&nbsp"+$("#ramal-seleccionada").val()+"?"; 
+                } 
                 $('#deshabilitarRamal').modal('show');
             });
             
@@ -709,11 +887,13 @@
                     e.preventDefault();
                    
                    var unidad = $(this).val();
+                   var id_ruta = $("#selectRuta").val();
+                   
                    if(unidad !== ''){
                        $.ajax({
-                            url: 'buscar_unidad.htm',
+                            url: 'buscar_unidad_ramal.htm',
                             type: "GET",
-                            data: { unidad: unidad }, 
+                            data: { unidad: unidad, id_ruta: id_ruta }, 
                         success: function (data) {
                             if(data.length > 0){
                                 var lista = "";
@@ -736,11 +916,69 @@
                 $(document).on('click','a[id=click-unidad]', function(){
                     $("#buscarUnidad").val('');
                     var id =  $(this).data("id");
-                    console.log($("#unidadesA").val());
-                    var button = '<button id="eliminarUnidad" class="btn btn-unidades">Unidad '+$(this).text()+'</button>';
+                    var unidadesN = $("#unidadesN").val();
+                    
+                    if(unidadesN !== ""){
+                        unidadesN = JSON.parse(unidadesN);
+                        for( var i = 0; i < unidadesN.length; i++){ 
+                            array.push(unidadesN[i]);
+                        }   
+                    }
+                    
+                    array.push(id);
+                    document.getElementById("unidadesN").value = JSON.stringify(array);
+                    array = [];
+                    
+                    var button = '<a href="#" data-id="'+id+'" id="eliminarUnidad" class="btn btn-unidades">Unidad '+$(this).text()+' <i class="fas fa-times-circle"></i></a>';
                     $("#unidades").append(button);
                     $("#show-list-unidades").html('');
                 });
+                
+                var unidadesE = [];
+                $('#selectRuta').on('change', function(){
+                    $('#unidades').empty();
+                    
+                    var unidadesA = JSON.parse($("#unidadesA").val());
+                    for( var i = 0; i < unidadesA.length; i++){ 
+                        unidadesE.push(unidadesA[i]);
+                    }
+                    
+                    document.getElementById("unidadesN").value = "";
+                    document.getElementById("unidadesE").value = JSON.stringify(unidadesE);
+                    array = []; 
+                    unidadesE = [];
+                });
+            });
+        </script>
+        
+        <script>
+            var unidadesE = [];
+            $(document).on('click','a[id=eliminarUnidad]', function(){
+                $(this).remove();
+                var index =  $(this).data("id");          
+                unidadesE.push(index);
+                var unidadesN = $("#unidadesN").val();
+                var unidadesEL = $("#unidadesE").val();
+                
+                if(unidadesN !== "" && unidadesEL !== ""){
+                    unidadesN = JSON.parse(unidadesN);
+                    for( var i = 0; i < unidadesN.length; i++){ 
+                        if ( unidadesN[i] === index) { 
+                            unidadesN.splice(i, 1); 
+                        }
+                    }
+                    unidadesEL = JSON.parse(unidadesEL);
+                    for( var i = 0; i < unidadesE.length; i++){ 
+                        unidadesEL.push(unidadesE[i]);
+                    }
+                    
+                    document.getElementById("unidadesN").value = JSON.stringify(unidadesN);
+                    document.getElementById("unidadesE").value = JSON.stringify(unidadesEL);
+                } else {
+                    document.getElementById("unidadesE").value = JSON.stringify(unidadesE);
+                }
+                
+                
             });
         </script>
         
@@ -772,12 +1010,16 @@
                             $("#numero").val(data.numero);
                             document.getElementById("selectRuta").value = data.id_ruta;
                             $("#kmz").val(JSON.stringify(data.kmz));
-                            $("#unidadesA").val(JSON.stringify(data.unidades));
+                            //$("#unidadesA").val(JSON.stringify(data.unidades));
+                            var unidades = [];
                             
                             for(var i in data.unidades){
-                                var button = '<button type="button" id="btn-eliminar-unidad" class="btn btn-unidades">Unidad '+data.unidades[i].no_unidad+'</button>';
+                                unidades.push(data.unidades[i].id_unidad);
+                                var button = '<a href="#" data-id="'+data.unidades[i].id_unidad+'" type="button" id="eliminarUnidad" class="btn btn-unidades">Unidad '+data.unidades[i].no_unidad+' <i class="fas fa-times-circle"></i></a>';
                                 $("#unidades").append(button);
                             }
+                            
+                            $("#unidadesA").val(JSON.stringify(unidades));
                             
                             var kmz = JSON.parse($("#kmz").val());
                             var arrayKMZ = [];
@@ -806,9 +1048,17 @@
             $('#btn-deshabilitar').click(function (e) {
                 e.preventDefault();
                 var buscarRamal = $("#buscarRamal").val();
+                var nombre = $("#nombre").val();
                 
                 if(buscarRamal !== ''){
                     var id_ramal = $("#id_ramal").val();
+                    var estatus = $("#estatus").val();
+                    
+                    if(estatus === '1'){
+                        estatus = '0';
+                    } else{
+                        estatus = '1';
+                    }
                     var currentDate = new Date();
                     var fecha_actualizacion = currentDate.getFullYear() + "-" + (('0' + (currentDate.getMonth() + 1)).slice(-2)) + "-" + ('0' + currentDate.getDate()).slice(-2) + " " + ("0" + currentDate.getHours()).slice(-2) + ":" + ("0" + currentDate.getMinutes()).substr(-2) + ":" + currentDate.getSeconds();        
 
@@ -818,12 +1068,17 @@
                         dataType: 'json',
                         data: {
                             id_ramal: id_ramal,
-                            statusRamal: 0,
+                            statusRamal: estatus,
                             fecha_actualizacion: fecha_actualizacion
                         },
                         success: function (data) {
                             var nombre = data.nombre;
-                            document.getElementById("msgExito").innerHTML = "Se ha deshabilitado el ramal"+"&nbsp"+nombre; 
+                            
+                            if(estatus === '1'){
+                                document.getElementById("msgExito").innerHTML = "Se ha habilitado el ramal"+"&nbsp"+nombre;
+                            } else{
+                                document.getElementById("msgExito").innerHTML = "Se ha deshabilitado el ramal"+"&nbsp"+nombre;
+                            }
                             $('#modalExito').modal('show');
                             $('#modalExito').on('hidden.bs.modal', function () {
                                 location.reload();
@@ -877,6 +1132,11 @@
                 var nombre = $("#nombre").val();
                 var numero = $("#numero").val();
                 var id_ruta = $("#selectRuta").val();
+                var unidadesN = $("#unidadesN").val();
+                var unidadesE = $("#unidadesE").val();
+                console.log('N '+unidadesN);
+                console.log('E '+unidadesE);
+                console.log('-----------');
                 var kmz = $("#kmz").val();
                 var currentDate = new Date();
                 var fecha_actualizacion = currentDate.getFullYear() + "-" + (('0' + (currentDate.getMonth() + 1)).slice(-2)) + "-" + ('0' + currentDate.getDate()).slice(-2) + " " + ("0" + currentDate.getHours()).slice(-2) + ":" + ("0" + currentDate.getMinutes()).substr(-2) + ":" + currentDate.getSeconds();
@@ -889,12 +1149,14 @@
                         id_ramal: id_ramal,
                         nombre: nombre,
                         numero: numero,
+                        unidadesN: unidadesN,
+                        unidadesE: unidadesE,
                         kmz: kmz,
                         id_ruta: id_ruta,
                         fecha_actualizacion: fecha_actualizacion
                     },
                     success: function (data) {
-                        var nombre = data.nombre;
+                        
                         document.getElementById("msgExito").innerHTML = "Se ha actualizado los datos del ramal"+"&nbsp"+nombre; 
                         $('#modalExito').modal('show');
                         $('#modalExito').on('hidden.bs.modal', function () {

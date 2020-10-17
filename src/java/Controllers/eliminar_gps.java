@@ -7,8 +7,8 @@ package Controllers;
 
 import Config.Conexion;
 import java.io.IOException;
+import java.sql.Statement;
 import java.io.PrintWriter;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -27,12 +27,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * @author Carlos Larios
  */
 public class eliminar_gps {
-    private Conexion connec;
-    Conexion cn = new Conexion();
-    Connection con;
+
     PreparedStatement ps;
     ResultSet rs;
-    Model.lectura_vehiculo lv = new Model.lectura_vehiculo();
+    Statement s;
     
     
     @RequestMapping("eliminar_gps.htm")
@@ -40,14 +38,16 @@ public class eliminar_gps {
         HttpSession session = request.getSession(false);
         org.springframework.web.servlet.ModelAndView mav = new org.springframework.web.servlet.ModelAndView();
 
-         mav.setViewName("eliminar_gps");
+        mav.setViewName("eliminar_gps");
         
         return mav;
     }
     
     @RequestMapping(value = "eliminar_informacion_gps.htm", method = RequestMethod.POST)
-    public void eliminar_informacion_gps(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ParseException, JSONException {
-
+    public void eliminar_informacion_gps(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, ParseException, JSONException, SQLException {
+        
+        Conexion Conexion = new Conexion();
+        
         response.setContentType("application/json;charset=utf-8");
         PrintWriter out = response.getWriter();
 
@@ -57,15 +57,17 @@ public class eliminar_gps {
         JSONObject datos = new JSONObject();
 
         try {
-            rs = Conexion.query("DELETE FROM \"GPS_unidad\" WHERE id_gps = "+id_gps+" RETURNING 0;");
-                //Conexion.query("DELETE FROM cat_unidad WHERE id_unidad = "+id_unidad+" RETURNING 0;");
+            
+            s = Conexion.update("DELETE FROM \"GPS_unidad\" WHERE id_gps = "+id_gps+";");
+            rs = s.getGeneratedKeys();
             
             datos.put("estado", 1);
-            
-            rs.close();
 
         } catch (SQLException e) {
             System.err.print(e);
+        } finally {
+            if (Conexion != null) { Conexion.executeQueryCloseUpdate(); System.out.println("close conexion"); }
+            if (rs != null) { rs.close(); System.out.println("close rs"); }
         }
 
         out.print(datos);

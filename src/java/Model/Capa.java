@@ -12,12 +12,14 @@ package Model;
 public class Capa {
     
     private int id;
+    private int estatus;
     private String nombre, icon, kmz;
 
-    public Capa(int id, String nombre, String icon, String kmz) {
+    public Capa(int id, String nombre, String icon, String kmz, int estatus) {
         this.id = id;
         this.nombre = nombre;
         this.icon = icon;
+        this.estatus = estatus;
         this.kmz = kmz;
     }
 
@@ -27,6 +29,14 @@ public class Capa {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getEstatus() {
+        return estatus;
+    }
+
+    public void setEstatus(int estatus) {
+        this.estatus = estatus;
     }
 
     public String getNombre() {
@@ -52,5 +62,9 @@ public class Capa {
     public void setKmz(String kmz) {
         this.kmz = kmz;
     }
+
+
+
+   
     
 }

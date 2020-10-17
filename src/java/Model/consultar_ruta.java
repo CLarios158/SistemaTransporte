@@ -12,6 +12,12 @@ import java.sql.Date;
  * @author Carlos Larios
  */
 public class consultar_ruta {
+    
+    public consultar_ruta(int id_ruta, String nombre) {
+        this.id_ruta = id_ruta;
+        this.nombre = nombre;
+    }
+    
     public consultar_ruta(Integer id_ruta, Integer id_capa, String nombre, Integer numero, Boolean statusRuta, String KMZ, Date fecha_registro, Date fecha_actualizacion) {
         this.id_ruta = id_ruta;
         this.id_capa = id_capa;

@@ -12,6 +12,12 @@ import java.sql.Date;
  * @author Carlos Larios
  */
 public class consultar_capa {
+    
+    public consultar_capa(int id_capa, String nombre) {
+        this.id_capa = id_capa;
+        this.nombre = nombre;
+    }
+    
     public consultar_capa(Integer id_capa, String nombre, String Icon,Boolean statusCapa, String descripcion, Date fecha_registro, Date fecha_actualizacion) {
         this.id_capa = id_capa;
         this.nombre = nombre;

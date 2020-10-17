@@ -1,13 +1,8 @@
-<%@page import="java.util.Iterator"%>
-<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@page import="Model.lectura_vehiculo"%>
-<%@page import="java.util.List"%>
-<%@page import="ModelDAO.lectura_vehiculoDAO"%>
 <%@page import="Config.Conexion"%>
 <%@page import="java.sql.ResultSet"%>
 <%@page import="java.sql.SQLException"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -17,9 +12,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
         <title>Sistema de Monitoreo</title>
-        <script async defer
-                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAdTfw1waJScSYaMdXKGqAW6rnHcwmjZwc&callback=initMap">
-        </script>
         <!--link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"/-->
         <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
         <link rel="stylesheet" href="css/bootstrap.min.css">
@@ -161,19 +153,17 @@
                         <label class="text-white">Información GPS</label>
                     </div>
                 </div>
-                <form name="myForm" onsubmit="return(validate());">
-                    <div class="form-group center">
-                        <div class="col-sm-2">
-                            <label style="font-size: 13px;" class="text-white">Buscar NIV:</label>
-                        </div>
-                        <div class="col-sm-2">
-                            <i class="fas fa-search icon-input"></i>
-                            <input type="text" class="form-control" name="buscarNIV" id="buscarNIV" autocomplete="off">
-                            <div style="z-index: 2; position: absolute; width: 87%;"  class="list-group" id="show-list"></div>
-                        </div>
-                        
+                <div class="form-group center">
+                    <div class="col-sm-2">
+                        <label style="font-size: 13px;" class="text-white">Buscar NIV:</label>
                     </div>
-                </form>
+                    <div class="col-sm-2">
+                        <i class="fas fa-search icon-input"></i>
+                        <input type="text" class="form-control" name="buscarNIV" id="buscarNIV" autocomplete="off">
+                        <div style="z-index: 2; position: absolute; width: 87%;"  class="list-group" id="show-list"></div>
+                    </div>
+
+                </div>
                 <div class="form-group center">
                     <div class="col-sm-2">
                         <label style="font-size: 13px;" class="text-white">Número de Serie GPS:</label>
@@ -205,7 +195,7 @@
                 </div>
             </div>
             <div id="show-edit-gps" style="display: none;">
-                <form name="formEdit" onsubmit="return(validateEdit());">
+                <form name="myForm" onsubmit="return(validate());">
                     <div class="row" style="margin: 20px 0px 20px 0px;">
                         <div class="col center">
                             <label class="text-white">Modificar Información GPS</label>
@@ -217,6 +207,7 @@
                         </div>
                         <div class="col-sm-2">
                             <input class="form-control" id="no_serie" name="no_serie" autocomplete="off" />
+                            <p id="errorSerie" style="color: #F8E71C; font-size: 12px; height: 0px; display: none;"></p>
                         </div>
                     </div>
                     <div class="form-group center">
@@ -225,18 +216,12 @@
                         </div>
                         <div class="col-sm-2">
                             <select style="display: inline;" class="form-control" id="selectModelo" name="selectModelo" autocomplete="off">
-                                <option value="empty"></option>
-                                <%
-                                    try {
-                                        ResultSet r = Conexion.query("SELECT \"id_modelo_GPS\", nombre FROM \"cat_modelo_GPS\";");
-                                        while (r.next()) {%>
-                                            <option value=<%= r.getString(1)%>><%= r.getString(2)%></option>
-                                <%}
-                                        r.close();
-                                    } catch (Exception e) {
-                                    }
-                                %>
+                                <option value="0"></option>
+                                <c:forEach var="model_p" items="${modelos_option}">
+                                    <option value=${model_p.getId_model()}>${model_p.getNombre()}</option>
+                                </c:forEach> 
                             </select>
+                            <p id="errorModelo" style="color: #F8E71C; font-size: 12px; height: 0px; display: none;"></p>
                         </div>
                     </div>  
                     <div class="form-group center">
@@ -245,6 +230,7 @@
                         </div>
                         <div class="col-sm-2">
                             <input class="form-control" id="kilometraje" name="kilometraje" autocomplete="off" />
+                            <p id="errorKilometraje" style="color: #F8E71C; font-size: 12px; height: 0px; display: none;"></p>
                         </div>
                     </div>
                     <div class="form-group center">
@@ -305,11 +291,11 @@
                             <div class="col center"><i style="color: #28a745;" class="fas fa-check-circle fa-2x"></i></div>
                         </div>
                         <div class="row">
-                            <div class="col center"><h4 class="text-white">Exito</h4></div>
+                            <div class="col center"><h5 class="text-white">Exito</h5></div>
                         </div>
                         <div class="separator center"></div>
                         <div class="row">
-                            <div class="col center"><p style="color: #f8e71c; font-weight: bold; font-size: 12px;">Se ha actualizado correctamente la información del GPS</p></div>
+                            <div class="col center"><p style="color: #f8e71c; font-weight: bold; font-size: 14px;">Se ha actualizado correctamente la información del GPS</p></div>
                         </div>
                         <div class="row">
                             <div class="col center"><button class="btn btn-primary" data-dismiss="modal">Aceptar</button></div> 
@@ -419,24 +405,38 @@
             });
         </script>
         
-        <!-- Validar Formulario Para Actualizar -->
+        <!-- Validar Formulario -->
         <script type = "text/javascript">
-            function validateEdit() {
+            function validate() {
 
-                if (document.formEdit.no_serie.value === "") {
-                    alert("Por favor ingresa el número de serie!");
-                    document.formEdit.no_serie.focus();
+                if (document.myForm.no_serie.value === "") {
+                    document.getElementById("errorSerie").innerHTML = "Por favor, ingrese el número de serie.";
+                    $("#errorSerie").show();
+                    document.myForm.no_serie.focus();
                     return false;
+                }else{
+                    document.getElementById("errorSerie").innerHTML = "";
+                    $("#errorSerie").hide();
                 }
-                if (document.formEdit.selectModelo.value === "" || document.formEdit.selectModelo.value === "empty") {
-                    alert("Por favor seleccione un modelo de GPS!");
-                    document.formEdit.selectModelo.focus();
+                
+                if (document.myForm.selectModelo.value === "" || document.myForm.selectModelo.value === "0") {
+                    document.getElementById("errorModelo").innerHTML = "Por favor, seleccione el modelo.";
+                    $("#errorModelo").show();
+                    document.myForm.selectModelo.focus();
                     return false;
+                }else{
+                    document.getElementById("errorModelo").innerHTML = "";
+                    $("#errorModelo").hide();
                 }
-                if (document.formEdit.kilometraje.value === "") {
-                    alert("Por favor ingrese el kilometraje!");
-                    document.formEdit.kilometraje.focus();
+                
+                if (document.myForm.kilometraje.value === "") {
+                    document.getElementById("errorKilometraje").innerHTML = "Por favor, ingrese el kilometraje.";
+                    $("#errorKilometraje").show();
+                    document.myForm.kilometraje.focus();
                     return false;
+                }else{
+                    document.getElementById("errorKilometraje").innerHTML = "";
+                    $("#errorKilometraje").hide();
                 }
               
                 return(true);
@@ -452,13 +452,13 @@
                 var no_serie = document.getElementById("no_serie").value;
                 var id_modelo_gps = document.getElementById("selectModelo").value;
                 
-                //var niv = document.getElementById("buscarNIV").value;
+                var niv = document.getElementById("buscarNIV").value;
                 var id_unidad = document.getElementById("id_unidad").value;
                 var kilometraje = document.getElementById("kilometraje").value;
                 var currentDate = new Date();
                 var fecha_actualizacion = currentDate.getFullYear() + "-" + (('0' + (currentDate.getMonth() + 1)).slice(-2)) + "-" + ('0' + currentDate.getDate()).slice(-2) + " " + ("0" + currentDate.getHours()).slice(-2) + ":" + ("0" + currentDate.getMinutes()).substr(-2) + ":" + currentDate.getSeconds();
 
-                if(validateEdit()){
+                if(validate()){
                     $.ajax({
                         url: 'actualizar_gps.htm',
                         method : 'POST',
@@ -466,6 +466,7 @@
                         data: {
                             id_gps: id_gps,
                             no_serie: no_serie,
+                            niv: niv,
                             id_modelo_gps: id_modelo_gps,
                             id_unidad : id_unidad,
                             kilometraje: kilometraje,
@@ -479,10 +480,10 @@
                                 location.reload();
                             });
                         }else{
-                            document.getElementById("errorGPS").innerHTML = "El GPS se encuentra asociado a una unidad.";
+                            document.getElementById("errorGPS").innerHTML = "El niv no se encuentra asociado a un GPS.";
                         }
-                    },error:  function(){
-                        alert("entro");
+                    },error:  function(e){
+                        console.log(e);
                     }});  
                 }
             });

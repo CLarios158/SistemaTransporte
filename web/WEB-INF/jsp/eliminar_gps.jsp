@@ -1,13 +1,8 @@
-<%@page import="java.util.Iterator"%>
-<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@page import="Model.lectura_vehiculo"%>
-<%@page import="java.util.List"%>
-<%@page import="ModelDAO.lectura_vehiculoDAO"%>
 <%@page import="Config.Conexion"%>
 <%@page import="java.sql.ResultSet"%>
 <%@page import="java.sql.SQLException"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -17,9 +12,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
         <title>Sistema de Monitoreo</title>
-        <script async defer
-                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAdTfw1waJScSYaMdXKGqAW6rnHcwmjZwc&callback=initMap">
-        </script>
         <!--link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"/-->
         <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
         <link rel="stylesheet" href="css/bootstrap.min.css">
@@ -85,95 +77,12 @@
 
                     <div class="col-md-5">
                         <div class="cn-wrapper">
-
-                            <%
-                                try {
-                                    ResultSet r = Conexion.query("select * from sp_advertencias_promedio()");
-                                    while (r.next()) {
-                                        if (r.getString(1).equals("Critico")) {%>
-
-                            <div class="display-chart">
-                                <div class="dc-info">
-                                    <i class="dc-icon dc-danger"></i>
-                                    <div class="dc-info-content">
-                                        <span class="dc-info-top"><%= r.getString(2)%>%</span>
-                                        <span class="dc-info-msg"><%= r.getString(1)%></span>
-                                    </div>
-                                </div>
-                                <div class="progress">
-                                    <div class="progress-bar" role="progressbar" style="width: <%= r.getString(2)%>%"></div>
-                                </div>
-                            </div>
-
-                            <%
-                            } else if (r.getString(1).equals("Advertencia")) {%>
-
-
-                            <div class="display-chart">
-                                <div class="dc-info">
-                                    <i class="dc-icon dc-warning"></i>
-                                    <div class="dc-info-content">
-                                        <span class="dc-info-top"><%= r.getString(2)%>%</span>
-                                        <span class="dc-info-msg"><%= r.getString(1)%></span>
-                                    </div>
-                                </div>
-                                <div class="progress">
-                                    <div class="progress-bar" role="progressbar" style="width: <%= r.getString(2)%>%"></div>
-                                </div>
-                            </div>
-
-                            <%
-                            } else if (r.getString(1).equals("Informativo")) {%>
-
-                            <div class="display-chart">
-                                <div class="dc-info">
-                                    <i class="dc-icon dc-info"></i>
-                                    <div class="dc-info-content">
-                                        <span class="dc-info-top"><%= r.getString(2)%>%</span>
-                                        <span class="dc-info-msg"><%= r.getString(1)%></span>
-                                    </div>
-                                </div>
-                                <div class="progress">
-                                    <div class="progress-bar" role="progressbar" style="width: <%= r.getString(2)%>%"></div>
-                                </div>
-                            </div>
                         </div>
-                    </div>
-
-
-                    <%
-                                }
-                            }
-                            r.close();
-                        } catch (Exception e) {
-                        }
-                    %>        
+                    </div>       
 
 
                     <div class="col-md-5">
                         <div class="cn-wrapper">
-                            <%
-                                try {
-                                    ResultSet r = Conexion.query("select * from sp_acceso_datos_db()");
-                                    while (r.next()) {
-                                        if (r.getString(2).equals("1")) {%>
-                            <div class="display-status">
-                                <i class="ds-icon ds-success"></i>
-                                <span class="ds-msg"> <%= r.getString(1)%></span>
-                            </div>
-                            <%
-                            } else if (r.getString(2).equals("0")) {%>
-                            <div class="display-status"> 
-                                <i class="ds-icon ds-danger"></i>
-                                <span class="ds-msg"><%= r.getString(1)%></span>
-                            </div>
-                            <%
-                                        }
-                                    }
-                                    r.close();
-                                } catch (Exception e) {
-                                }
-                            %>
                         </div>
                     </div>
 
@@ -189,7 +98,13 @@
                 <nav class="nav navigator flex-column">
                     <a class="nav-link active" href="index.htm"><i class="fas fa-home"></i> HOME</a>
                     <ul class="menu">
-                        <li><a class="nav-link" href="<c:url value="index.htm" />" ><i class="fas fa-map-marker-alt"></i> GPS</a></li>
+                        <li><a class="nav-link" href="#"><i class="fas fa-map-marker-alt"></i>  GPS <i style="float: right;" class="fas fa-angle-down"></i></a>
+                            <ul class="sub-menu">
+                                <li><a class="nav-link" href="asociar_gps.htm"><i class="fas fa-arrows-alt-h"></i>ASOCIAR GPS</a></li>
+                                <li><a class="nav-link" href="consultar_gps.htm"><i class="fas fa-search"></i>CONSULTAR INFORMACIÓN</a></li>
+                                <li><a class="nav-link" href="eliminar_gps.htm"><i class="fas fa-trash-alt"></i>ELIMINAR INFORMACIÓN</a></li>
+                            </ul>
+                        </li>
                         <li><a class="nav-link" href="#"><i class="far fa-window-restore"></i> CAPAS <i style="float: right;" class="fas fa-angle-down"></i></a>
                             <ul class="sub-menu">
                                 <li><a class="nav-link" href="crear_capa.htm"><i class="fas fa-plus-circle"></i> CREAR NUEVA CAPA</a></li>
@@ -327,10 +242,10 @@
                         </div>
                         <div class="separator center"></div>
                         <div class="row">
-                            <div class="col center"><p style="font-size: 12px;" >Si elimina la información se perderá la información de rastreo de la unidad.</p></div>
+                            <div class="col center"><p style="font-size: 14px;" >Si elimina la información se perderá la información de rastreo de la unidad.</p></div>
                         </div>
                         <div class="row">
-                            <div class="col center"><p style="color: #f8e71c; font-weight: bold; font-size: 12px;">¿Desea eliminar la información de rastreo?</p></div>
+                            <div class="col center"><p style="color: #f8e71c; font-weight: bold; font-size: 14px;">¿Desea eliminar la información de rastreo?</p></div>
                         </div>                        
                         <input type="text" hidden id="id_unidad" name="id_unidad" />
                         <input type="text" hidden id="id_gps" name="id_gps" />
@@ -356,7 +271,7 @@
                         </div>
                         <div class="separator center"></div>
                         <div class="row">
-                            <div class="col center"><p style="color: #f8e71c; font-weight: bold; font-size: 12px;">Se ha eliminado la información del GPS</p></div>
+                            <div class="col center"><p style="color: #f8e71c; font-weight: bold; font-size: 14px;">Se ha eliminado la información del GPS</p></div>
                         </div>
                         <div class="row">
                             <div class="col center"><button class="btn btn-primary" data-dismiss="modal">Aceptar</button></div> 
